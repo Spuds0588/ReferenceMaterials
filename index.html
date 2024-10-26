@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Layout</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card h2 {
+            margin: 0 0 10px;
+        }
+        .card p {
+            margin: 0 0 20px;
+        }
+        .card a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .card a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h2>Card Title 1</h2>
+            <p>This is a description for card 1.</p>
+            <a href="#">Read more</a>
+        </div>
+        <div class="card">
+            <h2>Card Title 2</h2>
+            <p>This is a description for card 2.</p>
+            <a href="#">Read more</a>
+        </div>
+        <div class="card">
+            <h2>Card Title 3</h2>
+            <p>This is a description for card 3.</p>
+            <a href="#">Read more</a>
+        </div>
+    </div>
+</body>
+</html>
