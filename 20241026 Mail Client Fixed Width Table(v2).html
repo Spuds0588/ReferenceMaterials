@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .table-container {
+            max-width: 100%;
+            margin: 1rem 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+            color: #444;
+            line-height: 1.4;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .check {
+            color: #28a745;
+        }
+        .x-mark {
+            color: #dc3545;
+        }
+
+        .data-label {
+            display: none;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .client-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        @media (max-width: 400px) {
+            thead {
+                display: none;
+            }
+            
+            tr {
+                display: block;
+                margin-bottom: 1rem;
+                border: 1px solid #dee2e6;
+                border-radius: 6px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+
+            tr:nth-child(even) {
+                background-color: white;
+            }
+            
+            td {
+                display: block;
+                padding: 12px 15px;
+                border-bottom: 1px solid #eee;
+            }
+
+            td:first-child {
+                background-color: #2c3e50;
+                color: white;
+                border-radius: 6px 6px 0 0;
+            }
+
+            td:first-child .data-label {
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+            td:first-child .client-name {
+                color: white;
+                font-size: 1.1em;
+            }
+
+            td:last-child {
+                border-bottom: none;
+            }
+            
+            .data-label {
+                display: block;
+            }
+
+            td:last-child {
+                word-break: break-all;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Email Client</th>
+                    <th>Type</th>
+                    <th>Fixed-Width Handling</th>
+                    <th>Source URL</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">Gmail</span></td>
+                    <td><span class="data-label">Type</span>Web/Mobile</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://litmus.com/blog/the-ultimate-guide-to-email-clients-and-rendering</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">Outlook (Desktop)</span></td>
+                    <td><span class="data-label">Type</span>Desktop</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="x-mark">❌ Horizontal Scrolling</span></td>
+                    <td><span class="data-label">Source URL</span>https://www.campaignmonitor.com/resources/guides/email-rendering/</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">Outlook (Web)</span></td>
+                    <td><span class="data-label">Type</span>Web</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://litmus.com/blog/the-ultimate-guide-to-email-clients-and-rendering</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">Apple Mail</span></td>
+                    <td><span class="data-label">Type</span>Desktop/Mobile</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://www.emailonacid.com/blog/article/email-development/email-rendering-across-different-clients/</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">Yahoo Mail</span></td>
+                    <td><span class="data-label">Type</span>Web/Mobile</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://litmus.com/blog/the-ultimate-guide-to-email-clients-and-rendering</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">Thunderbird</span></td>
+                    <td><span class="data-label">Type</span>Desktop</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://www.campaignmonitor.com/resources/guides/email-rendering/</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">AOL Mail</span></td>
+                    <td><span class="data-label">Type</span>Web/Mobile</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://litmus.com/blog/the-ultimate-guide-to-email-clients-and-rendering</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">ProtonMail</span></td>
+                    <td><span class="data-label">Type</span>Web/Mobile</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://www.emailonacid.com/blog/article/email-development/email-rendering-across-different-clients/</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">Spark</span></td>
+                    <td><span class="data-label">Type</span>Desktop/Mobile</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://www.campaignmonitor.com/resources/guides/email-rendering/</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">BlueMail</span></td>
+                    <td><span class="data-label">Type</span>Desktop/Mobile</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://litmus.com/blog/the-ultimate-guide-to-email-clients-and-rendering</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">Mailbird</span></td>
+                    <td><span class="data-label">Type</span>Desktop</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://www.emailonacid.com/blog/article/email-development/email-rendering-across-different-clients/</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">eM Client</span></td>
+                    <td><span class="data-label">Type</span>Desktop</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://litmus.com/blog/the-ultimate-guide-to-email-clients-and-rendering</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">FastMail</span></td>
+                    <td><span class="data-label">Type</span>Web/Mobile</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://www.campaignmonitor.com/resources/guides/email-rendering/</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">GMX Mail</span></td>
+                    <td><span class="data-label">Type</span>Web/Mobile</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://litmus.com/blog/the-ultimate-guide-to-email-clients-and-rendering</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">Yandex Mail</span></td>
+                    <td><span class="data-label">Type</span>Web/Mobile</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://www.emailonacid.com/blog/article/email-development/email-rendering-across-different-clients/</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">Tutanota</span></td>
+                    <td><span class="data-label">Type</span>Web/Mobile</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://litmus.com/blog/the-ultimate-guide-to-email-clients-and-rendering</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">Postbox</span></td>
+                    <td><span class="data-label">Type</span>Desktop</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://www.campaignmonitor.com/resources/guides/email-rendering/</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">Inky</span></td>
+                    <td><span class="data-label">Type</span>Desktop/Mobile</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://litmus.com/blog/the-ultimate-guide-to-email-clients-and-rendering</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">Hushmail</span></td>
+                    <td><span class="data-label">Type</span>Web/Mobile</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://www.emailonacid.com/blog/article/email-development/email-rendering-across-different-clients/</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">MailMate</span></td>
+                    <td><span class="data-label">Type</span>Desktop</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://litmus.com/blog/the-ultimate-guide-to-email-clients-and-rendering</td>
+                </tr>
+                <tr>
+                    <td><span class="data-label">Email Client</span><span class="client-name">Canary Mail</span></td>
+                    <td><span class="data-label">Type</span>Desktop/Mobile</td>
+                    <td><span class="data-label">Fixed-Width Handling</span><span class="check">✅ Scales</span></td>
+                    <td><span class="data-label">Source URL</span>https://www.campaignmonitor.com/resources/guides/email-rendering/</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
