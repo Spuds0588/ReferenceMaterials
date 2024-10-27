@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Palette</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<h2>Color Palette</h2>
+<table>
+    <tr>
+        <th>Color Name</th>
+        <th>Hex Value</th>
+        <th>HSL Value</th>
+        <th>Color Sample</th>
+    </tr>
+    <tr>
+        <td>Soft Blue</td>
+        <td onclick="copyToClipboard('#A3DFFF')">#A3DFFF</td>
+        <td onclick="copyToClipboard('hsl(195, 100%, 85%)')">hsl(195, 100%, 85%)</td>
+        <td><div style="width: 30px; height: 30px; background-color: #A3DFFF; border-radius: 50%;"></div></td>
+    </tr>
+    <tr>
+        <td>Pale Cyan</td>
+        <td onclick="copyToClipboard('#E0FFFF')">#E0FFFF</td>
+        <td onclick="copyToClipboard('hsl(180, 100%, 94%)')">hsl(180, 100%, 94%)</td>
+        <td><div style="width: 30px; height: 30px; background-color: #E0FFFF; border-radius: 50%;"></div></td>
+    </tr>
+    <tr>
+        <td>Mint Green</td>
+        <td onclick="copyToClipboard('#C8FACC')">#C8FACC</td>
+        <td onclick="copyToClipboard('hsl(128, 86%, 89%)')">hsl(128, 86%, 89%)</td>
+        <td><div style="width: 30px; height: 30px; background-color: #C8FACC; border-radius: 50%;"></div></td>
+    </tr>
+    <tr>
+        <td>Light Coral</td>
+        <td onclick="copyToClipboard('#FFD9CC')">#FFD9CC</td>
+        <td onclick="copyToClipboard('hsl(10, 100%, 89%)')">hsl(10, 100%, 89%)</td>
+        <td><div style="width: 30px; height: 30px; background-color: #FFD9CC; border-radius: 50%;"></div></td>
+    </tr>
+    <tr>
+        <td>Pastel Orange</td>
+        <td onclick="copyToClipboard('#FFCC99')">#FFCC99</td>
+        <td onclick="copyToClipboard('hsl(30, 100%, 80%)')">hsl(30, 100%, 80%)</td>
+        <td><div style="width: 30px; height: 30px; background-color: #FFCC99; border-radius: 50%;"></div></td>
+    </tr>
+</table>
+
+<h2>JSON Object</h2>
+<pre onclick="copyToClipboard(`{
+    &#34;background&#34;: &#34;#E0FFFF&#34;,  // Pale Cyan
+    &#34;primary&#34;: &#34;#A3DFFF&#34;,     // Soft Blue
+    &#34;accent&#34;: &#34;#C8FACC&#34;,      // Mint Green
+    &#34;highlight&#34;: &#34;#FFD9CC&#34;,   // Light Coral
+    &#34;cta&#34;: &#34;#FFCC99&#34;          // Pastel Orange
+}`)">
+{
+  "background": "#E0FFFF",  // Pale Cyan
+  "primary": "#A3DFFF",     // Soft Blue
+  "accent": "#C8FACC",      // Mint Green
+  "highlight": "#FFD9CC",   // Light Coral
+  "cta": "#FFCC99"          // Pastel Orange
+}
+</pre>
+
+<div class="modal" id="modal">
+    Copied to clipboard!
+</div>
+
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            const modal = document.getElementById('modal');
+            modal.style.display = 'block';
+            setTimeout(function() {
+                modal.style.display = 'none';
+            }, 1000);
+        });
+    }
+</script>
+
+</body>
+</html>
