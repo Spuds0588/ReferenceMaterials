@@ -42,6 +42,56 @@
       font-size: 2.5rem;
     }
 
+    .intro-section {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    .intro-section h2 {
+      color: var(--heading-color);
+      margin-bottom: 1rem;
+    }
+
+    .key-points {
+      margin: 1rem 0;
+      padding-left: 1.5rem;
+    }
+
+    .key-points li {
+      margin-bottom: 0.5rem;
+    }
+
+    .css-example {
+      margin: 1.5rem 0;
+      padding: 1rem;
+      background: #f1f5f9;
+      border-radius: var(--border-radius);
+    }
+
+    .live-demo {
+      margin: 2rem 0;
+      padding: 1rem;
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
+    }
+
+    .demo-box {
+      width: 100px;
+      height: 100px;
+      background: red;
+      margin: 1rem auto;
+      transition: filter 0.3s ease;
+    }
+
+    .demo-box:hover {
+      filter: url(#blurFilter);
+    }
+
     .filters-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -101,6 +151,12 @@
       display: block;
     }
 
+    .notes {
+      font-size: 0.9rem;
+      color: #64748b;
+      margin-top: 0.5rem;
+    }
+
     @media (max-width: 768px) {
       :root {
         --spacing: 0.75rem;
@@ -123,7 +179,76 @@
 <body>
   <div class="container">
     <h1>SVG Filters Demonstration</h1>
+
+    <!-- New Documentation Section -->
+    <div class="intro-section">
+      <h2>Using SVG Filters with CSS</h2>
+      <p>SVG filters can be applied to any HTML element using CSS. This powerful combination allows you to create complex visual effects that can be dynamically controlled through CSS.</p>
+      
+      <h3>Key Points:</h3>
+      <ul class="key-points">
+        <li>SVG filters can be defined once and reused multiple times</li>
+        <li>Filters can be applied to any HTML element using the CSS filter property</li>
+        <li>Filters can be combined with CSS transitions and animations</li>
+        <li>Multiple filters can be chained together</li>
+        <li>Filters can be toggled with CSS pseudo-classes like :hover and :focus</li>
+      </ul>
+
+      <div class="code-block">
+        <code>/* Basic filter usage */
+.element {
+  filter: url(#filterId);
+}
+
+/* Multiple filters */
+.element {
+  filter: url(#filter1) url(#filter2);
+}
+
+/* Combining with CSS filters */
+.element {
+  filter: url(#svgFilter) blur(5px);
+}</code>
+      </div>
+
+      <h3>Live Demo</h3>
+      <p>Hover over the box below to see the blur filter in action:</p>
+      
+      <div class="live-demo">
+        <div class="demo-box"></div>
+        <p class="notes">The box above uses this CSS:</p>
+        <div class="code-block">
+          <code>.demo-box:hover {
+  filter: url(#blurFilter);
+  transition: filter 0.3s ease;
+}</code>
+        </div>
+      </div>
+
+      <h3>Common Use Cases:</h3>
+      <ul class="key-points">
+        <li>Adding blur effects on hover</li>
+        <li>Creating drop shadows</li>
+        <li>Image effects (grayscale, sepia, etc.)</li>
+        <li>Complex animations</li>
+        <li>Text effects</li>
+      </ul>
+
+      <div class="css-example">
+        <h4>Browser Support Note:</h4>
+        <p>SVG filters are well-supported in modern browsers. However, it's good practice to provide fallbacks:</p>
+        <div class="code-block">
+          <code>.element {
+  /* Fallback for browsers that don't support SVG filters */
+  filter: blur(5px);
+  /* SVG filter */
+  filter: url(#customBlur);
+}</code>
+        </div>
+      </div>
+    </div>
     
+    <!-- Original Filter Examples -->
     <div class="filters-grid">
       <!-- Original Rectangle -->
       <div class="filter-demo">
@@ -155,16 +280,16 @@
         </div>
         <p class="description">This filter applies a Gaussian blur to the rectangle.</p>
         <div class="code-block">
-          <code>&lt;svg viewBox="0 0 200 200"&gt;
-  &lt;defs&gt;
-    &lt;filter id="blurFilter"&gt;
-      &lt;feGaussianBlur in="SourceGraphic" 
-        stdDeviation="5" /&gt;
-    &lt;/filter&gt;
-  &lt;/defs&gt;
-  &lt;rect width="100" height="100" fill="red" 
-    filter="url(#blurFilter)" /&gt;
-&lt;/svg&gt;</code>
+          <code>/* SVG Definition */
+&lt;filter id="blurFilter"&gt;
+  &lt;feGaussianBlur in="SourceGraphic" 
+    stdDeviation="5" /&gt;
+&lt;/filter&gt;
+
+/* CSS Usage */
+.element {
+  filter: url(#blurFilter);
+}</code>
         </div>
       </div>
 
@@ -187,19 +312,19 @@
         </div>
         <p class="description">This filter converts the rectangle to grayscale using a color matrix.</p>
         <div class="code-block">
-          <code>&lt;svg viewBox="0 0 200 200"&gt;
-  &lt;defs&gt;
-    &lt;filter id="colorMatrixFilter"&gt;
-      &lt;feColorMatrix type="matrix" 
-        values="0.33 0.33 0.33 0 0  
-                0.33 0.33 0.33 0 0  
-                0.33 0.33 0.33 0 0  
-                0 0 0 1 0" /&gt;
-    &lt;/filter&gt;
-  &lt;/defs&gt;
-  &lt;rect width="100" height="100" fill="red" 
-    filter="url(#colorMatrixFilter)" /&gt;
-&lt;/svg&gt;</code>
+          <code>/* SVG Definition */
+&lt;filter id="colorMatrixFilter"&gt;
+  &lt;feColorMatrix type="matrix" 
+    values="0.33 0.33 0.33 0 0  
+            0.33 0.33 0.33 0 0  
+            0.33 0.33 0.33 0 0  
+            0 0 0 1 0" /&gt;
+&lt;/filter&gt;
+
+/* CSS Usage */
+.element {
+  filter: url(#colorMatrixFilter);
+}</code>
         </div>
       </div>
 
@@ -218,16 +343,16 @@
         </div>
         <p class="description">This filter adds a drop shadow to the rectangle.</p>
         <div class="code-block">
-          <code>&lt;svg viewBox="0 0 200 200"&gt;
-  &lt;defs&gt;
-    &lt;filter id="dropShadowFilter"&gt;
-      &lt;feDropShadow dx="5" dy="5" 
-        stdDeviation="3" /&gt;
-    &lt;/filter&gt;
-  &lt;/defs&gt;
-  &lt;rect width="100" height="100" fill="red" 
-    filter="url(#dropShadowFilter)" /&gt;
-&lt;/svg&gt;</code>
+          <code>/* SVG Definition */
+&lt;filter id="dropShadowFilter"&gt;
+  &lt;feDropShadow dx="5" dy="5" 
+    stdDeviation="3" /&gt;
+&lt;/filter&gt;
+
+/* CSS Usage */
+.element {
+  filter: url(#dropShadowFilter);
+}</code>
         </div>
       </div>
 
@@ -252,23 +377,23 @@
         </div>
         <p class="description">This example combines a blur, grayscale conversion, and drop shadow.</p>
         <div class="code-block">
-          <code>&lt;svg viewBox="0 0 200 200"&gt;
-  &lt;defs&gt;
-    &lt;filter id="combinedFilter"&gt;
-      &lt;feGaussianBlur in="SourceGraphic" 
-        stdDeviation="3" /&gt;
-      &lt;feColorMatrix type="matrix" 
-        values="0.33 0.33 0.33 0 0  
-                0.33 0.33 0.33 0 0  
-                0.33 0.33 0.33 0 0  
-                0 0 0 1 0" /&gt;
-      &lt;feDropShadow dx="5" dy="5" 
-        stdDeviation="2" /&gt;
-    &lt;/filter&gt;
-  &lt;/defs&gt;
-  &lt;rect width="100" height="100" fill="red" 
-    filter="url(#combinedFilter)" /&gt;
-&lt;/svg&gt;</code>
+          <code>/* SVG Definition */
+&lt;filter id="combinedFilter"&gt;
+  &lt;feGaussianBlur in="SourceGraphic" 
+    stdDeviation="3" /&gt;
+  &lt;feColorMatrix type="matrix" 
+    values="0.33 0.33 0.33 0 0  
+            0.33 0.33 0.33 0 0  
+            0.33 0.33 0.33 0 0  
+            0 0 0 1 0" /&gt;
+  &lt;feDropShadow dx="5" dy="5" 
+    stdDeviation="2" /&gt;
+&lt;/filter&gt;
+
+/* CSS Usage */
+.element {
+  filter: url(#combinedFilter);
+}</code>
         </div>
       </div>
     </div>
