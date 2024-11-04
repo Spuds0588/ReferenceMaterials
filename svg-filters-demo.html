@@ -173,6 +173,31 @@
       .filter-demo {
         padding: 1rem;
       }
+
+      .ul-links {
+        list-style-type: none;
+      }
+
+      .ul-links > li {
+        margin: 1rem;
+        transition: scale 500ms ease-in-out;
+      }
+
+      .ul-links > li > a {
+        background: grey;
+      border-radius: var(--border-radius);
+      padding: 5px;
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+    
+      }
+
+      .ul-links > li:hover {
+     scale: 1.1;
+     
+
+      }
     }
   </style>
 </head>
@@ -397,6 +422,14 @@
         </div>
       </div>
     </div>
+    <!--Demo Links-->
+      <div class="filter-demo">
+        <h2>Links to More Examples</h2>
+        <ul class="ul-links" align="center">
+          <li><a href="https://codepen.io/mandynicole/pen/BaXROMQ">SVG Morph</a></li>
+          <li><a href="https://codepen.io/thebabydino/pen/WNVzBRY">Simple Dithering Background</a></li>
+        </ul>
+      </div>
   </div>
 </body>
 </html>
