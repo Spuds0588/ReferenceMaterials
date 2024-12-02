@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SharePoint Page Context Details in Modern Script Editor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #0078d4;
+        }
+        .card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            padding: 20px;
+        }
+        .card h2 {
+            color: #0078d4;
+        }
+        .code-snippet {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+        .code-snippet code {
+            display: block;
+            white-space: pre;
+        }
+        .reminder {
+            background-color: #ffeb3b;
+            padding: 10px;
+            border-left: 5px solid #fbc02d;
+            margin: 20px 0;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SharePoint Page Context Details in Modern Script Editor</h1>
+        <p>I've used Copilot to compile how to retrieve various page context details in SharePoint Online using the <code>_spPageContextInfo</code> variable. This is useful for SharePoint admins and web developers who want to access page-specific information on their SharePoint pages.</p>
+        
+        <div class="reminder">
+            <p><strong>Reminder:</strong> Ensure that the "Enable classic _spPageContextInfo" setting is enabled in the Modern Script Editor web part to access the <code>_spPageContextInfo</code> object.</p>
+        </div>
+
+        <div class="card">
+            <h2>1. Web Server Relative URL</h2>
+            <p>To get the web server relative URL, which is a string, use the following JavaScript code:</p>
+            <div class="code-snippet">
+                <code>
+var webServerRelativeUrl = _spPageContextInfo.webServerRelativeUrl;
+console.log("Web Server Relative URL: " + webServerRelativeUrl);
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>2. Site Absolute URL</h2>
+            <p>To get the site absolute URL, which is a string, use the following JavaScript code:</p>
+            <div class="code-snippet">
+                <code>
+var siteAbsoluteUrl = _spPageContextInfo.siteAbsoluteUrl;
+console.log("Site Absolute URL: " + siteAbsoluteUrl);
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>3. Web Title</h2>
+            <p>To get the web title, which is a string, use the following JavaScript code:</p>
+            <div class="code-snippet">
+                <code>
+var webTitle = _spPageContextInfo.webTitle;
+console.log("Web Title: " + webTitle);
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>4. Web Logo URL</h2>
+            <p>To get the web logo URL, which is a string representing the URL of the web's logo, use the following JavaScript code:</p>
+            <div class="code-snippet">
+                <code>
+var webLogoUrl = _spPageContextInfo.webLogoUrl;
+console.log("Web Logo URL: " + webLogoUrl);
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>5. Current Language</h2>
+            <p>To get the current language, which is a number representing the language code, use the following JavaScript code:</p>
+            <div class="code-snippet">
+                <code>
+var currentLanguage = _spPageContextInfo.currentLanguage;
+console.log("Current Language: " + currentLanguage);
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>6. Page List ID</h2>
+            <p>To get the page list ID, which is a string, use the following JavaScript code:</p>
+            <div class="code-snippet">
+                <code>
+var pageListId = _spPageContextInfo.pageListId;
+console.log("Page List ID: " + pageListId);
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>7. Page Item ID</h2>
+            <p>To get the page item ID, which is a number, use the following JavaScript code:</p>
+            <div class="code-snippet">
+                <code>
+var pageItemId = _spPageContextInfo.pageItemId;
+console.log("Page Item ID: " + pageItemId);
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>8. Web Template</h2>
+            <p>To get the web template, which is a string, use the following JavaScript code:</p>
+            <div class="code-snippet">
+                <code>
+var webTemplate = _spPageContextInfo.webTemplate;
+console.log("Web Template: " + webTemplate);
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Further Reading</h2>
+            <p>If you have questions about accessing the logged in user details from the <code>_spPageContextInfo</code> object, please refer to <a href="https://example.com">this article</a> for more information.</p>
+        </div>
+    </div>
+</body>
+</html>
