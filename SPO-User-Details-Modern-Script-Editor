@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn SharePoint User Details Retrieval</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #0078d4;
+        }
+        .card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+            padding: 20px;
+        }
+        .card h2 {
+            color: #0078d4;
+        }
+        .code-snippet {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+        .code-snippet code {
+            display: block;
+            white-space: pre;
+        }
+        .reminder {
+            background-color: #ffeb3b;
+            padding: 10px;
+            border-left: 5px solid #fbc02d;
+            margin: 20px 0;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Learn SharePoint User Details Retrieval</h1>
+        <p>Welcome to this tutorial! Here, you'll learn how to retrieve various user details in SharePoint Online using the <code>_spPageContextInfo</code> variable. This is useful for SharePoint admins and web developers who want to display user information on their SharePoint pages.</p>
+        
+        <div class="reminder">
+            <p><strong>Reminder:</strong> Ensure that the "Enable classic _spPageContextInfo" setting is enabled in the Modern Script Editor web part to access the <code>_spPageContextInfo</code> object.</p>
+        </div>
+
+        <div class="card">
+            <h2>Understanding <code>_spPageContextInfo</code></h2>
+            <p>The <code>_spPageContextInfo</code> is an object provided by SharePoint that contains various properties about the current page context, including user details. These properties can be accessed directly or by assigning them to variables. Below are examples of how to retrieve different user details using this object.</p>
+        </div>
+
+        <div class="card">
+            <h2>1. User Display Name</h2>
+            <p>To get the user's display name, which is a string, use the following JavaScript code:</p>
+            <div class="code-snippet">
+                <code>
+var userDisplayName = _spPageContextInfo.userDisplayName;
+console.log("User Display Name: " + userDisplayName);
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>2. User Email</h2>
+            <p>To get the user's email address, which is a string, use the following JavaScript code:</p>
+            <div class="code-snippet">
+                <code>
+var userEmail = _spPageContextInfo.userEmail;
+console.log("User Email: " + userEmail);
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>3. User Login Name</h2>
+            <p>To get the user's login name, which is a string, use the following JavaScript code:</p>
+            <div class="code-snippet">
+                <code>
+var userLoginName = _spPageContextInfo.userLoginName;
+console.log("User Login Name: " + userLoginName);
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>4. User ID</h2>
+            <p>To get the user's ID, which is a number, use the following JavaScript code:</p>
+            <div class="code-snippet">
+                <code>
+var userId = _spPageContextInfo.userId;
+console.log("User ID: " + userId);
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>5. User Principal Name (UPN)</h2>
+            <p>To get the user's principal name, which is a string, use the following JavaScript code:</p>
+            <div class="code-snippet">
+                <code>
+var userPrincipalName = _spPageContextInfo.userPrincipalName;
+console.log("User Principal Name: " + userPrincipalName);
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>6. User Title</h2>
+            <p>To get the user's title, which is a string, use the following JavaScript code:</p>
+            <div class="code-snippet">
+                <code>
+var userTitle = _spPageContextInfo.userTitle;
+console.log("User Title: " + userTitle);
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>7. User Department</h2>
+            <p>To get the user's department, which is a string, use the following JavaScript code:</p>
+            <div class="code-snippet">
+                <code>
+var userDepartment = _spPageContextInfo.userDepartment;
+console.log("User Department: " + userDepartment);
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>8. User Picture URL</h2>
+            <p>To get the user's picture URL, which is a string representing the URL of the user's profile picture, use the following JavaScript code:</p>
+            <div class="code-snippet">
+                <code>
+var userPictureUrl = _spPageContextInfo.userPictureUrl;
+console.log("User Picture URL: " + userPictureUrl);
+                </code>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Further Reading</h2>
+            <p>If you have other questions about the <code>_spPageContextInfo</code> object and its attributes, please refer to this <a href="https://example.com">detailed article</a> for more information.</p>
+        </div>
+    </div>
+</body>
+</html>
