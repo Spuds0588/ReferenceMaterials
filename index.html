@@ -30,6 +30,7 @@
         }
         .card h2 {
             margin: 0 0 10px;
+            font-size: clamp(1rem, 4vw, 1.25rem);
         }
         .card p {
             margin: 0 0 20px;
@@ -42,9 +43,10 @@
             text-decoration: underline;
         }
         .readmore {
-            vertical-align: bottom;
-            padding-bottom:none;
-            padding-top: auto;
+            align-self: center; /* Changed from flex-start to center the link horizontally */
+            margin-top: auto; /* Keeps the link at the bottom of the card */
+            color: #007BFF; /* Maintains the blue color */
+            text-decoration: none; /* Removes underline by default */
         }
     </style>
 </head>
@@ -62,7 +64,7 @@
         </div>
          <div class="card">
             <h2>📋Copy Bookmarklet Generator</h2>
-            <p>Bookmarklet generator for easily copying a specify text string to your clipboard via bookmarklet. Includes success and error notifications on browser page.</p>
+            <p>Bookmarklet generator for easily copying a specify text string to your clipboard via bookmarklet.</p>
             <a href="https://spuds0588.github.io/ReferenceMaterials/copy-bookmarklet-generator.html" class="readmore">Try it</a>
         </div>
         
