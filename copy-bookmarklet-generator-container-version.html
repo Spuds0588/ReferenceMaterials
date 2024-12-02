@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copy Bookmarklet Generator</title>
+    <style>
+        .bookmarklet_app_container * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        .bookmarklet_app_container {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .bookmarklet_app_container .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .bookmarklet_app_container #textInput {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .bookmarklet_app_container #generateBtn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .bookmarklet_app_container #generateBtn:hover {
+            background-color: #45a049;
+        }
+
+        .bookmarklet_app_container .result-container {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .bookmarklet_app_container #bookmarkletCode {
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 4px;
+            word-wrap: break-word;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+        }
+
+        .bookmarklet_app_container .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .bookmarklet_app_container .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .bookmarklet_app_container .btn-copy {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .bookmarklet_app_container .btn-copy:hover {
+            background-color: #1E88E5;
+        }
+
+        .bookmarklet_app_container .btn-new {
+            background-color: #FF9800;
+            color: white;
+        }
+
+        .bookmarklet_app_container .btn-new:hover {
+            background-color: #F57C00;
+        }
+
+        .bookmarklet_app_container #browserInstructions {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #e7f3fe;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .bookmarklet_app_container #browserInstructions h3 {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bookmarklet_app_container #browserInstructions ol {
+            padding-left: 30px;
+        }
+
+        .bookmarklet_app_container #browserInstructions li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="bookmarklet_app_container">
+        <div class="container">
+            <h1>📋Copy Bookmarklet Generator</h1>
+            
+            <div id="inputSection">
+                <textarea id="textInput" placeholder="Enter the text you want to copy in the bookmarklet"></textarea>
+                <button id="generateBtn">
+                    <span>✨ Generate Bookmarklet</span>
+                </button>
+            </div>
+
+            <div id="resultSection" class="result-container">
+                <div id="bookmarkletCode"></div>
+                <div class="button-group">
+                    <button id="copyBtn" class="btn btn-copy">
+                        <span>📋 Copy Bookmarklet</span>
+                    </button>
+                    <button id="newBtn" class="btn btn-new">
+                        <span>🆕 Generate New Bookmarklet</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="browserInstructions"></div>
+        </div>
+    </div>
+
+    <script>
+        // The entire script remains the same as in the original document
+        const textInput = document.getElementById('textInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const resultSection = document.getElementById('resultSection');
+        const bookmarkletCode = document.getElementById('bookmarkletCode');
+        const inputSection = document.getElementById('inputSection');
+        const copyBtn = document.getElementById('copyBtn');
+        const newBtn = document.getElementById('newBtn');
+        const browserInstructions = document.getElementById('browserInstructions');
+
+        function generateBookmarklet(text) {
+            return `javascript:(function(){var text='${text}';navigator.clipboard.writeText(text).then(function(){var box=document.createElement('div');box.style.position='fixed';box.style.top='10px';box.style.right='10px';box.style.backgroundColor='green';box.style.color='white';box.style.padding='10px';box.style.borderRadius='5px';box.style.zIndex='10000';box.innerText='📋Link Copied Successfully';document.body.appendChild(box);setTimeout(function(){document.body.removeChild(box);},700);},function(){var box=document.createElement('div');box.style.position='fixed';box.style.top='10px';box.style.right='10px';box.style.backgroundColor='red';box.style.color='white';box.style.padding='10px';box.style.borderRadius='5px';box.style.zIndex='10000';box.innerText='❌Failed to Copy - Try Again';document.body.appendChild(box);setTimeout(function(){document.body.removeChild(box);},700);});})();`;
+        }
+
+        function detectBrowser() {
+            const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+            const isFirefox = typeof InstallTrigger !== 'undefined';
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            const isEdge = /Edge/.test(navigator.userAgent);
+
+            let instructions = '';
+
+            if (isChrome) {
+                instructions = `
+                    <h3>🌐 Adding Bookmarklet in Chrome</h3>
+                    <ol>
+                        <li>Drag the code into your bookmarks bar</li>
+                        <li>Or right-click on the bookmarks bar and select "Add page"</li>
+                        <li>Paste the entire code into the URL field</li>
+                    </ol>
+                `;
+            } else if (isFirefox) {
+                instructions = `
+                    <h3>🦊 Adding Bookmarklet in Firefox</h3>
+                    <ol>
+                        <li>Right-click on the bookmarks toolbar</li>
+                        <li>Select "New Bookmark"</li>
+                        <li>Paste the entire code into the "Location" field</li>
+                    </ol>
+                `;
+            } else if (isSafari) {
+                instructions = `
+                    <h3>🍎 Adding Bookmarklet in Safari</h3>
+                    <ol>
+                        <li>Show your bookmarks bar (View > Show Bookmarks Bar)</li>
+                        <li>Drag the code into the bookmarks bar</li>
+                    </ol>
+                `;
+            } else if (isEdge) {
+                instructions = `
+                    <h3>🌊 Adding Bookmarklet in Microsoft Edge</h3>
+                    <ol>
+                        <li>Click the star icon to save a bookmark</li>
+                        <li>Edit the bookmark and paste the entire code into the URL field</li>
+                    </ol>
+                `;
+            } else {
+                instructions = `
+                    <h3>🌍 Adding Bookmarklet</h3>
+                    <p>Drag the code into your browser's bookmarks bar or create a new bookmark and paste the code into the URL/Location field.</p>
+                `;
+            }
+
+            return instructions;
+        }
+
+        generateBtn.addEventListener('click', () => {
+            if (textInput.value.trim() === '') {
+                alert('Please enter some text');
+                return;
+            }
+
+            const bookmarklet = generateBookmarklet(textInput.value.trim());
+            
+            inputSection.style.display = 'none';
+            resultSection.style.display = 'flex';
+            bookmarkletCode.textContent = bookmarklet;
+            
+            // Show browser instructions
+            browserInstructions.innerHTML = detectBrowser();
+            browserInstructions.style.display = 'block';
+        });
+
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(bookmarkletCode.textContent).then(() => {
+                alert('Bookmarklet copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy bookmarklet');
+            });
+        });
+
+        newBtn.addEventListener('click', () => {
+            inputSection.style.display = 'block';
+            resultSection.style.display = 'none';
+            browserInstructions.style.display = 'none';
+            textInput.value = '';
+            browserInstructions.innerHTML = '';
+        });
+    </script>
+</body>
+</html>
