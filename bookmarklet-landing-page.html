@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Code Editor Bookmarklet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        pre {
+            background-color: #f4f4f4;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            overflow-x: auto;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <div class="container mx-auto px-4 py-12 max-w-4xl">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4 text-blue-600">Quick Code Editor Bookmarklet</h1>
+            <p class="text-xl text-gray-600">Instantly launch a full-featured online code editor from CORS-compatible webpages</p>
+        </header>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-blue-500">What is this Bookmarklet?</h2>
+                <p class="mb-4">
+                    A bookmarklet is a small JavaScript program stored as a bookmark in your web browser. When clicked, it performs a specific function on the current webpage. This bookmarklet instantly opens a full StackBlitz online code editor in a draggable modal.
+                </p>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
+                    <strong>Compatibility Note:</strong>
+                    <p class="text-sm mt-2">
+                        Works on CORS-compatible webpages including:
+                        <ul class="list-disc list-inside text-sm">
+                            <li>SharePoint</li>
+                            <li>PowerApps</li>
+                            <li>Power Automate</li>
+                            <li>Copilot</li>
+                            <li>And other sites with CORS support</li>
+                        </ul>
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-semibold mb-4 text-green-500">How to Install</h2>
+                <ol class="space-y-3 text-gray-700">
+                    <li class="flex items-center">
+                        <span class="mr-3 text-2xl font-bold text-green-500">1</span>
+                        Drag the button below to your bookmarks bar
+                    </li>
+                    <li class="flex items-center">
+                        <span class="mr-3 text-2xl font-bold text-green-500">2</span>
+                        Click the bookmark on any compatible webpage to open the code editor
+                    </li>
+                </ol>
+                <a href="#" id="bookmarkletLink" class="inline-block mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition">
+                    🧑‍💻 Code Bookmarklet
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-lg mt-8">
+            <h2 class="text-2xl font-semibold mb-4 text-purple-500">Bookmarklet Code</h2>
+            <pre><code id="bookmarkletCode" class="text-sm break-words"></code></pre>
+            <button id="copyButton" onclick="copyCode()" class="mt-4 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 transition relative">
+                <span id="copyButtonText">Copy Code</span>
+                <span id="copySuccessIcon" class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300">
+                    ✅ Copied!
+                </span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Detect browser and update bookmarklet link
+        function detectBrowser() {
+            const isChrome = /Chrome/.test(navigator.userAgent);
+            const isFirefox = /Firefox/.test(navigator.userAgent);
+            const isSafari = /Safari/.test(navigator.userAgent);
+            const isEdge = /Edg/.test(navigator.userAgent);
+
+            const bookmarkletLink = document.getElementById('bookmarkletLink');
+            const bookmarkletCode = document.getElementById('bookmarkletCode');
+
+            const code = `javascript:(function(){var modal=document.createElement('div');modal.style.position='fixed';modal.style.top='50%';modal.style.left='50%';modal.style.transform='translate(-50%, -50%)';modal.style.backgroundColor='transparent';modal.style.padding='20px';modal.style.zIndex='10000';modal.style.border='none';modal.style.boxShadow='0 2px 10px rgba(0,0,0,0.1)';modal.innerHTML='<iframe src="https://stackblitz.com/edit/blank?file=index.html" style="width:80vw;height:80vh;border:none;"></iframe>';var overlay=document.createElement('div');overlay.style.position='fixed';overlay.style.top='0';overlay.style.left='0';overlay.style.width='100%';overlay.style.height='100%';overlay.style.backgroundColor='rgba(0, 0, 0, 0.5)';overlay.style.zIndex='9999';document.body.appendChild(overlay);document.body.appendChild(modal);var buttonContainer=document.createElement('div');buttonContainer.style.position='fixed';buttonContainer.style.top='calc(10% - 35px)';buttonContainer.style.left='calc(90% - 35px)';buttonContainer.style.width='120px';buttonContainer.style.height='40px';buttonContainer.style.backgroundColor='rgba(255, 255, 255, 0.8)';buttonContainer.style.borderRadius='10px';buttonContainer.style.display='flex';buttonContainer.style.alignItems='center';buttonContainer.style.justifyContent='flex-start';buttonContainer.style.cursor='move';buttonContainer.style.zIndex='10001';buttonContainer.style.border='1px solid #ccc';var minimizeButton=document.createElement('div');minimizeButton.style.width='30px';minimizeButton.style.height='30px';minimizeButton.style.border='2px solid blue';minimizeButton.style.color='blue';minimizeButton.style.borderRadius='50%';minimizeButton.style.display='flex';minimizeButton.style.alignItems='center';minimizeButton.style.justifyContent='center';minimizeButton.style.cursor='pointer';minimizeButton.style.margin='0 5px';minimizeButton.innerHTML='−';minimizeButton.onclick=function(){if(modal.style.display==='none'){modal.style.display='block';overlay.style.display='block';minimizeButton.innerHTML='−';}else{modal.style.display='none';overlay.style.display='none';minimizeButton.innerHTML='+';}};buttonContainer.appendChild(minimizeButton);var closeButton=document.createElement('div');closeButton.style.width='30px';closeButton.style.height='30px';closeButton.style.border='2px solid red';closeButton.style.color='red';closeButton.style.borderRadius='50%';closeButton.style.display='flex';closeButton.style.alignItems='center';closeButton.style.justifyContent='center';closeButton.style.cursor='pointer';closeButton.style.margin='0 5px';closeButton.innerHTML='✕';closeButton.onclick=function(){document.body.removeChild(modal);document.body.removeChild(overlay);document.body.removeChild(buttonContainer);};buttonContainer.appendChild(closeButton);var handle=document.createElement('div');handle.style.width='30px';handle.style.height='100%';handle.style.display='flex';handle.style.alignItems='center';handle.style.justifyContent='center';handle.style.cursor='move';handle.style.marginLeft='auto';handle.innerHTML='‖';buttonContainer.appendChild(handle);document.body.appendChild(buttonContainer);function makeDraggable(element){var pos1=0,pos2=0,pos3=0,pos4=0;element.onmousedown=dragMouseDown;function dragMouseDown(e){e=e||window.event;e.preventDefault();pos3=e.clientX;pos4=e.clientY;document.onmouseup=closeDragElement;document.onmousemove=elementDrag;}function elementDrag(e){e=e||window.event;e.preventDefault();pos1=pos3-e.clientX;pos2=pos4-e.clientY;pos3=e.clientX;pos4=e.clientY;element.style.top=(element.offsetTop-pos2)+'px';element.style.left=(element.offsetLeft-pos1)+'px';}function closeDragElement(){document.onmouseup=null;document.onmousemove=null;}}makeDraggable(buttonContainer);})();`;
+
+            bookmarkletCode.textContent = code;
+            bookmarkletLink.href = code;
+        }
+
+        function copyCode() {
+            const code = document.getElementById('bookmarkletCode').textContent;
+            const copyButton = document.getElementById('copyButton');
+            const copyButtonText = document.getElementById('copyButtonText');
+            const copySuccessIcon = document.getElementById('copySuccessIcon');
+
+            navigator.clipboard.writeText(code).then(() => {
+                copyButtonText.classList.add('opacity-0');
+                copySuccessIcon.classList.remove('opacity-0');
+
+                setTimeout(() => {
+                    copyButtonText.classList.remove('opacity-0');
+                    copySuccessIcon.classList.add('opacity-0');
+                }, 2000);
+            });
+        }
+
+        detectBrowser();
+    </script>
+</body>
+</html>
