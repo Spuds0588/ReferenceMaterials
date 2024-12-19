@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creating a Bookmarklet with Picture-in-Picture Functionality</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css">
+    <style>
+        .content pre {
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap !important;
+            word-wrap: break-word !important;
+        }
+        .content pre code {
+            white-space: pre-wrap !important;
+            word-wrap: break-word !important;
+        }
+        .hero.is-primary {
+            background: linear-gradient(135deg, #4a90e2, #2c3e50);
+        }
+        .section {
+            padding: 3rem 1.5rem;
+        }
+        .content h1, .content h2, .content h3 {
+            color: #2c3e50;
+        }
+        .content code {
+            color: #e74c3c;
+        }
+        .box {
+            margin: 1.5rem 0;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+        pre {
+            background-color: #f5f5f5 !important;
+            padding: 1.25em 1.5em !important;
+        }
+    </style>
+</head>
+<body>
+    <section class="hero is-primary is-bold">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title">
+                    Creating a Bookmarklet with Picture-in-Picture Functionality
+                </h1>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="content">
+                <div class="box">
+                    <h2>Introduction</h2>
+                    <p>This guide will walk you through creating a bookmarklet that uses the Picture-in-Picture (PiP) functionality to display custom HTML content, including iframes, in a floating window. We'll cover the basics, common pitfalls, and provide working examples.</p>
+                </div>
+
+                <div class="box">
+                    <h2>Prerequisites</h2>
+                    <ul>
+                        <li>Basic understanding of JavaScript and HTML.</li>
+                        <li>Familiarity with browser bookmarklets.</li>
+                    </ul>
+                </div>
+
+                <div class="box">
+                    <h2>Steps to Create a PiP Bookmarklet</h2>
+                    
+                    <h3>1. Basic Setup</h3>
+                    <p>Start by creating a basic bookmarklet that opens a Picture-in-Picture window with some simple content. Here's a minimal example:</p>
+                    <pre><code>javascript:(function(){
+    var pipWindowContent = document.createElement('div');
+    pipWindowContent.innerHTML = '&lt;style&gt;body{margin:0;font-family:Arial,sans-serif;}.pip-content{padding:20px;background:white;border:1px solid #ccc;}&lt;/style&gt;&lt;div class="pip-content"&gt;&lt;h1&gt;Test PIP Window&lt;/h1&gt;&lt;p&gt;This is a test to see if the PIP window works.&lt;/p&gt;&lt;/div&gt;';
+    documentPictureInPicture.requestWindow(pipWindowContent)
+        .then(pipWindow => {
+            pipWindow.document.body.appendChild(pipWindowContent);
+        })
+        .catch(error => {
+            console.error('Failed to open Picture-in-Picture window:', error);
+        });
+})();</code></pre>
+
+                    <h3>2. Adding an Iframe</h3>
+                    <p>Next, let's add an iframe to the PiP window. This example loads an external URL inside the PiP window:</p>
+                    <pre><code>javascript:(function(){
+    var newUrl = 'https://example.com';
+    var pipWindowContent = document.createElement('div');
+    pipWindowContent.style.width = '100vw';
+    pipWindowContent.style.height = '100vh';
+    pipWindowContent.style.display = 'flex';
+    pipWindowContent.style.justifyContent = 'center';
+    pipWindowContent.style.alignItems = 'center';
+    pipWindowContent.style.background = 'white';
+    pipWindowContent.innerHTML = '&lt;iframe src="' + newUrl + '" width="100%" height="100%" style="border:none;"&gt;&lt;/iframe&gt;';
+    documentPictureInPicture.requestWindow(pipWindowContent)
+        .then(pipWindow => {
+            pipWindow.document.body.appendChild(pipWindowContent);
+            pipWindow.document.body.style.overflow = 'hidden';
+        })
+        .catch(error => {
+            console.error('Failed to open Picture-in-Picture window:', error);
+        });
+})();</code></pre>
+
+                    <h3>3. Setting Initial Dimensions</h3>
+                    <p>To set initial dimensions for the PiP window, you can adjust the width and height of the content container:</p>
+                    <pre><code>javascript:(function(){
+    var newUrl = 'https://example.com';
+    var pipWindowContent = document.createElement('div');
+    pipWindowContent.style.width = '500px';
+    pipWindowContent.style.height = '90vh';
+    pipWindowContent.style.display = 'flex';
+    pipWindowContent.style.justifyContent = 'center';
+    pipWindowContent.style.alignItems = 'center';
+    pipWindowContent.style.background = 'white';
+    pipWindowContent.innerHTML = '&lt;iframe src="' + newUrl + '" width="100%" height="100%" style="border:none;"&gt;&lt;/iframe&gt;';
+    documentPictureInPicture.requestWindow(pipWindowContent)
+        .then(pipWindow => {
+            pipWindow.document.body.appendChild(pipWindowContent);
+            pipWindow.document.body.style.overflow = 'hidden';
+        })
+        .catch(error => {
+            console.error('Failed to open Picture-in-Picture window:', error);
+        });
+})();</code></pre>
+
+                    <h3>4. Hiding Scrollbars</h3>
+                    <p>To hide the vertical and horizontal scrollbars in the PiP window, set the <code>overflow</code> property to <code>hidden</code>:</p>
+                    <pre><code>javascript:(function(){
+    var newUrl = 'https://example.com';
+    var pipWindowContent = document.createElement('div');
+    pipWindowContent.style.width = '100vw';
+    pipWindowContent.style.height = '100vh';
+    pipWindowContent.style.display = 'flex';
+    pipWindowContent.style.justifyContent = 'center';
+    pipWindowContent.style.alignItems = 'center';
+    pipWindowContent.style.background = 'white';
+    pipWindowContent.style.overflow = 'hidden';
+    pipWindowContent.innerHTML = '&lt;iframe src="' + newUrl + '" width="100%" height="100%" style="border:none;"&gt;&lt;/iframe&gt;';
+    documentPictureInPicture.requestWindow(pipWindowContent)
+        .then(pipWindow => {
+            pipWindow.document.body.appendChild(pipWindowContent);
+            pipWindow.document.body.style.overflow = 'hidden';
+        })
+        .catch(error => {
+            console.error('Failed to open Picture-in-Picture window:', error);
+        });
+})();</code></pre>
+                </div>
+
+                <div class="box">
+                    <h2>Understanding the documentPictureInPicture Object</h2>
+                    <p>The <code>documentPictureInPicture</code> object is part of the Document Picture-in-Picture API, which extends the existing Picture-in-Picture API to allow arbitrary HTML content to be displayed in a floating, always-on-top window.</p>
+
+                    <h3>Methods</h3>
+                    <ul>
+                        <li><strong><code>requestWindow(element)</code></strong>: Opens a Picture-in-Picture window and displays the specified HTML element inside it. Returns a promise that resolves to the PiP window object.
+                            <ul>
+                                <li><strong>Parameters</strong>: 
+                                    <ul>
+                                        <li><code>element</code> (HTMLElement): The HTML element to display in the PiP window.</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Returns</strong>: Promise that resolves to the PiP window object.</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h3>Example Usage</h3>
+                    <pre><code>var pipWindowContent = document.createElement('div');
+pipWindowContent.innerHTML = '&lt;h1&gt;Hello from Picture-in-Picture!&lt;/h1&gt;';
+documentPictureInPicture.requestWindow(pipWindowContent)
+    .then(pipWindow => {
+        pipWindow.document.body.appendChild(pipWindowContent);
+    })
+    .catch(error => {
+        console.error('Failed to open Picture-in-Picture window:', error);
+    });</code></pre>
+
+                    <h3>Properties</h3>
+                    <ul>
+                        <li><strong><code>pipWindow.document</code></strong>: The document object of the PiP window, which can be used to manipulate the content inside the PiP window.</li>
+                    </ul>
+
+                    <h3>Example Usage</h3>
+                    <pre><code>documentPictureInPicture.requestWindow(pipWindowContent)
+    .then(pipWindow => {
+        pipWindow.document.body.appendChild(pipWindowContent);
+        pipWindow.document.body.style.overflow = 'hidden'; // Hide scrollbars
+    })
+    .catch(error => {
+        console.error('Failed to open Picture-in-Picture window:', error);
+    });</code></pre>
+                </div>
+
+                <div class="box">
+                    <h2>Common Pitfalls</h2>
+                    <div class="notification is-warning">
+                        <ol>
+                            <li><strong>Content Not Loading</strong>: Ensure the content is added to the PiP window after it has been created. This avoids issues where the content does not appear.</li>
+                            <li><strong>Scrollbars</strong>: If scrollbars appear, set <code>overflow: hidden</code> on both the PiP window content and the body of the PiP document.</li>
+                            <li><strong>Dimensions</strong>: Make sure the dimensions of the iframe and its parent container are set correctly to avoid layout issues.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="box">
+                    <h2>Conclusion</h2>
+                    <p>By following these steps, you can create a bookmarklet that uses the Picture-in-Picture functionality to display custom HTML content in a floating window. This can be useful for various applications, such as custom video players, productivity tools, and more.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
