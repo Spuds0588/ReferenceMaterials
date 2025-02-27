@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Post Optimizer</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f5f5f5;
+            padding: 16px;
+            font-size: 16px;
+        }
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .card-header {
+            background-color: #0a66c2;
+            color: white;
+            border-radius: 12px 12px 0 0;
+            padding: 16px;
+        }
+        .card-header-title {
+            font-size: 1.4rem;
+        }
+        .card-content {
+            padding: 20px;
+        }
+        .textarea {
+            min-height: 220px;
+            resize: vertical;
+            font-size: 1.1rem;
+            padding: 15px;
+            border-width: 2px;
+        }
+        .label {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+        .button {
+            height: auto;
+            padding: 14px 20px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .is-linkedin-blue {
+            background-color: #0a66c2;
+            color: white;
+        }
+        .result-container {
+            display: none;
+            margin-top: 24px;
+        }
+        .notification {
+            padding: 16px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+        }
+        .success-message {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .copilot-button-container {
+            display: none;
+            margin-top: 24px;
+            text-align: center;
+        }
+        #copilot-button {
+            padding: 16px 28px;
+            font-size: 1.3rem;
+        }
+        .output-text {
+            padding: 20px;
+            background-color: #fff;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            display: none;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+        /* Touch-friendly spacing */
+        .mt-3 {
+            margin-top: 15px;
+        }
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .card-content {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-title">
+                    <span class="icon mr-2">
+                        <i class="fab fa-linkedin"></i>
+                    </span>
+                    LinkedIn Post Optimizer
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="content">
+                    <div class="field" id="draft-section">
+                        <label class="label">Write your rough draft of your LinkedIn post</label>
+                        <div class="control">
+                            <textarea class="textarea" id="draft-textarea" placeholder="Enter your draft LinkedIn post here..."></textarea>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <button class="button is-linkedin-blue is-fullwidth" id="next-button">Next</button>
+                        </div>
+                    </div>
+                    
+                    <div class="result-container" id="result-container">
+                        <div class="notification is-primary" id="copy-success" style="display: none;">
+                            <strong>Copied to clipboard. Continue to Copilot?</strong>
+                        </div>
+                        <div class="notification is-danger" id="copy-error" style="display: none;">
+                            <strong>Couldn't copy automatically. Please use the button below:</strong>
+                            <button class="button is-light is-fullwidth mt-3" id="manual-copy-button">Copy to Clipboard</button>
+                        </div>
+                        <div id="output-text" class="output-text"></div>
+                    </div>
+                    
+                    <div class="copilot-button-container" id="copilot-button-container">
+                        <button class="button is-info is-large" id="copilot-button">Go to Copilot</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const draftTextarea = document.getElementById('draft-textarea');
+            const nextButton = document.getElementById('next-button');
+            const resultContainer = document.getElementById('result-container');
+            const copySuccess = document.getElementById('copy-success');
+            const copyError = document.getElementById('copy-error');
+            const manualCopyButton = document.getElementById('manual-copy-button');
+            const copilotButtonContainer = document.getElementById('copilot-button-container');
+            const copilotButton = document.getElementById('copilot-button');
+            const outputText = document.getElementById('output-text');
+            
+            // Template for the prompt
+            function generatePrompt(draftText) {
+                return `Take on the role of an experienced social media manager for LinkedIn. Revamp the post provided below to make it more engaging and impactful. Your response should *only* contain the complete final post, ready to copy and paste into LinkedIn. Avoid providing any explanations, headers, or formatting outside the post.
+
+### Instructions:
+1. Write a compelling title that grabs attention and appears "above the fold."
+2. Add relevant hashtags to maximize reach, placing them at the end of the post.
+3. Use emojis appropriately, but do **not** use the rocket 🚀 emoji.
+4. Format the text using plain text, emojis , and the supported unicode characters listed below, as LinkedIn only supports plain text, emojis, and unicode characters (no markdown).
+
+### Supported Unicode Formatting Options:
+#### **Text Styling Characters**
+- **Bold Characters**: 𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭 𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘵𝘂𝘃𝗺𝘅𝘺𝘇
+- **Italic Characters**: 𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡 𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘂𝘷𝘸𝘹𝘺𝘻
+- **Underline Characters**: 𝙰̲𝙱̲𝙲̲𝙳̲𝙴̲𝙵̲𝙶̲𝙷̲𝙸̲𝙹̲𝙺̲𝙻̲𝙼̲𝙽̲𝙾̲𝙿̲𝚀̲𝚁̲𝚂̲𝚃̲𝚄̲𝚅̲𝚆̲𝚇̲𝚈̲𝚉̲ 𝚊̲𝚋̲𝚌̲𝚍̲𝚎̲𝚏̲𝚐̲𝚑̲𝚒̲𝚓̲𝚔̲𝚕̲𝚖̲𝚗̲𝚘̲𝚙̲𝚚̲𝚛̲𝚜̲𝚝̲𝚞̲𝚟̲𝚠̲𝚡̲𝚢̲𝚣̲
+- **Strikethrough Characters**: 𝙰̶𝙱̶𝙲̶𝙳̶𝙴̶𝙵̶𝙶̶𝙷̶𝙸̶𝙹̶𝙺̶𝙻̶𝙼̶𝙽̶𝙾̶𝙿̶𝚀̶𝚁̶𝚂̶𝚃̶𝚄̶𝚅̶𝚆̶𝚇̶𝚈̶𝚉̶ 𝚊̶𝚋̶𝚌̶𝚍̶𝚎̶𝚏̶𝚐̶𝚑̶𝚒̶𝚓̶𝚔̶𝚕̶𝚖̶𝚗̶𝚘̶𝚙̶𝚚̶𝚛̶𝚜̶𝚝̶𝚞̶𝚟̶𝚠̶𝚡̶𝚢̶𝚣̶
+
+#### **Bullet and List Characters**
+- **Bullet Points**: ● ◉ ○ ▪ ◇ ◆ ► ▷
+- **Numbered List Indicators**: ① ② ③ ④ ⑤ (or other circled numbers up to ⑳)
+- **Arrows for Structure or Emphasis**: → ⇾ ➤ ➔ ➡ ➡️
+
+#### **Miscellaneous**
+- **Checkmarks**: ✓ ✔ ☑
+- **Stars**: ★ ☆ ✦ ✧
+- **Hearts**: ❤ ❥ ♥ 💛 💙 💚 💜
+- **Separators**: — • ⋆
+- **Ellipsis for Emphasis**: … ⋯ ⋮
+
+Use these formatting tools as needed to enhance readability, structure, and appeal.
+
+Provide the revamped post below, based on the following input:
+
+"""${draftText}"""`;
+            }
+            
+            nextButton.addEventListener('click', function() {
+                const draftText = draftTextarea.value.trim();
+                if (!draftText) {
+                    alert("Please enter your LinkedIn draft post first.");
+                    return;
+                }
+                
+                // Generate the prompt with the draft text
+                const prompt = generatePrompt(draftText);
+                
+                // Try to copy to clipboard
+                copyToClipboard(prompt);
+            });
+            
+            function copyToClipboard(text) {
+                // Show the result container first
+                resultContainer.style.display = 'block';
+                
+                // Save the text for possible manual copying
+                outputText.textContent = text;
+                
+                // Try the modern clipboard API
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(text)
+                        .then(() => {
+                            // Success
+                            copySuccess.style.display = 'block';
+                            copyError.style.display = 'none';
+                            copilotButtonContainer.style.display = 'block';
+                        })
+                        .catch((err) => {
+                            // Failed, show manual copy option
+                            copySuccess.style.display = 'none';
+                            copyError.style.display = 'block';
+                            outputText.style.display = 'block';
+                        });
+                } else {
+                    // Fallback for older browsers or non-secure contexts
+                    try {
+                        // Create a temporary textarea element
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        
+                        // Make the textarea out of viewport
+                        textArea.style.position = 'fixed';
+                        textArea.style.left = '-999999px';
+                        textArea.style.top = '-999999px';
+                        document.body.appendChild(textArea);
+                        
+                        // Select and copy
+                        textArea.focus();
+                        textArea.select();
+                        const successful = document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        
+                        if (successful) {
+                            // Success
+                            copySuccess.style.display = 'block';
+                            copyError.style.display = 'none';
+                            copilotButtonContainer.style.display = 'block';
+                        } else {
+                            // Failed, show manual copy option
+                            copySuccess.style.display = 'none';
+                            copyError.style.display = 'block';
+                            outputText.style.display = 'block';
+                        }
+                    } catch (err) {
+                        // Failed, show manual copy option
+                        copySuccess.style.display = 'none';
+                        copyError.style.display = 'block';
+                        outputText.style.display = 'block';
+                    }
+                }
+            }
+            
+            // Manual copy button functionality
+            manualCopyButton.addEventListener('click', function() {
+                // Try to copy again
+                const text = outputText.textContent;
+                
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(text)
+                        .then(() => {
+                            // Success
+                            copySuccess.style.display = 'block';
+                            copyError.style.display = 'none';
+                            copilotButtonContainer.style.display = 'block';
+                        })
+                        .catch((err) => {
+                            // Still failed, keep showing the text for manual selection
+                            alert("Please select all the text and copy it manually.");
+                        });
+                } else {
+                    try {
+                        // Create a temporary textarea element
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        
+                        // Make the textarea out of viewport
+                        textArea.style.position = 'fixed';
+                        textArea.style.left = '-999999px';
+                        textArea.style.top = '-999999px';
+                        document.body.appendChild(textArea);
+                        
+                        // Select and copy
+                        textArea.focus();
+                        textArea.select();
+                        const successful = document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        
+                        if (successful) {
+                            // Success
+                            copySuccess.style.display = 'block';
+                            copyError.style.display = 'none';
+                            copilotButtonContainer.style.display = 'block';
+                        } else {
+                            // Still failed, keep showing the text for manual selection
+                            alert("Please select all the text and copy it manually.");
+                        }
+                    } catch (err) {
+                        // Still failed, keep showing the text for manual selection
+                        alert("Please select all the text and copy it manually.");
+                    }
+                }
+            });
+            
+            // Go to Copilot button
+            copilotButton.addEventListener('click', function() {
+                // Check if we're on an Android device
+                const isAndroid = /Android/i.test(navigator.userAgent);
+                
+                if (isAndroid) {
+                    // Try to use an intent URL for Android
+                    window.location.href = "https://copilot.microsoft.com/";
+                    
+                    // Alternative: Try to use a deep link if Microsoft has one
+                    // window.location.href = "copilot://";
+                } else {
+                    // For other devices, just open the web URL
+                    window.open("https://copilot.microsoft.com/", "_blank");
+                }
+            });
+        });
+    </script>
+</body>
+</html>
