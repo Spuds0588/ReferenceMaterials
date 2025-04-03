@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video & Audio Combiner</title>
+    <style>
+        /* Basic Reset & Font */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top */
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Main Application Container */
+        #app-container {
+            background-color: #ffffff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            transition: box-shadow 0.3s ease;
+        }
+        #app-container:hover {
+             box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        h1 {
+            color: #1a73e8; /* Google Blue */
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        /* Input Section */
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #5f6368;
+        }
+
+        input[type="file"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+        input[type="file"]:hover {
+            border-color: #a0c3ff;
+        }
+
+        /* Button */
+        #combineButton {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: background-color 0.3s ease, opacity 0.3s ease, transform 0.1s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #combineButton:hover:not(:disabled) {
+            background-color: #155ab6;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+         #combineButton:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        #combineButton:disabled {
+            background-color: #e0e0e0;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Status/Progress Section */
+        #statusArea {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #e8eaed;
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        #progressBar {
+            width: 100%;
+            height: 12px;
+            appearance: none; /* Override default look */
+            border: none;
+            border-radius: 6px;
+            overflow: hidden; /* Ensure progress stays within bounds */
+            background-color: #e0e0e0; /* Track color */
+            margin-bottom: 10px;
+        }
+        /* Webkit browsers (Chrome, Safari) */
+        #progressBar::-webkit-progress-bar {
+            background-color: #e0e0e0;
+            border-radius: 6px;
+        }
+        #progressBar::-webkit-progress-value {
+            background-color: #4285f4; /* Google Blue */
+            border-radius: 6px;
+            transition: width 0.2s ease-out;
+        }
+        /* Firefox */
+        #progressBar::-moz-progress-bar {
+            background-color: #4285f4;
+            border-radius: 6px;
+            transition: width 0.2s ease-out;
+        }
+
+        #progressText, #etrText {
+            font-weight: 500;
+            color: #3c4043;
+            margin-left: 5px;
+        }
+        #etrText {
+            float: right;
+            font-size: 0.9em;
+            color: #5f6368;
+        }
+
+        #logOutput {
+            background-color: #202124; /* Dark background */
+            color: #e8eaed; /* Light text */
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+            font-size: 0.85em;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 150px;
+            overflow-y: auto;
+            white-space: pre-wrap; /* Wrap long lines */
+            word-wrap: break-word; /* Break long words */
+            margin-top: 15px;
+            border: 1px solid #5f6368;
+        }
+
+        /* Output/Download Section */
+        #outputArea {
+             margin-top: 25px;
+             padding: 20px;
+             background-color: #e6f4ea; /* Light green success */
+             border: 1px solid #b7e1c3;
+             border-radius: 8px;
+        }
+
+        #outputArea p {
+            margin-bottom: 15px;
+            color: #1e8e3e; /* Darker green text */
+            font-weight: 500;
+        }
+
+        #downloadLink {
+            display: inline-block;
+            background-color: #34a853; /* Google Green */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #downloadLink:hover {
+            background-color: #1e8e3e; /* Darker green */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Error Section */
+        #errorArea {
+             margin-top: 25px;
+             padding: 15px;
+             background-color: #fce8e6; /* Light red error */
+             border: 1px solid #f5c6cb;
+             border-radius: 8px;
+             color: #d93025; /* Darker red text */
+             font-weight: 500;
+        }
+
+        /* Helper class */
+        .hidden {
+            display: none;
+        }
+
+        /* Loading Indicator */
+        #loadingIndicator {
+            color: #5f6368;
+            font-style: italic;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <h1>Combine Video & Audio</h1>
+
+        <div id="loadingIndicator">
+            <p>Loading FFMPEG library... This might take a moment on first load.</p>
+        </div>
+
+        <div id="mainContent" class="hidden">
+            <div class="input-group">
+                <label for="videoFile">1. Select Video File:</label>
+                <input type="file" id="videoFile" accept="video/*">
+            </div>
+
+            <div class="input-group">
+                <label for="audioFile">2. Select Audio File:</label>
+                <input type="file" id="audioFile" accept="audio/*">
+            </div>
+
+            <button id="combineButton" disabled>Combine Files</button>
+
+            <!-- Status Area -->
+            <div id="statusArea" class="hidden">
+                <p><strong>Processing...</strong> <span id="etrText"></span></p>
+                <progress id="progressBar" value="0" max="100"></progress>
+                <span id="progressText">0%</span>
+                <pre id="logOutput" class="hidden"></pre> <!-- Log initially hidden -->
+            </div>
+
+            <!-- Output Area -->
+            <div id="outputArea" class="hidden">
+                <p>✅ Processing Complete!</p>
+                <a id="downloadLink" href="#" download="output.mp4">Download Combined MP4</a>
+            </div>
+
+             <!-- Error Area -->
+            <div id="errorArea" class="hidden">
+                <p>❌ Error during processing:</p>
+                <p id="errorMessage"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load FFMPEG.wasm -->
+    <!-- Make sure to use a version that suits your needs, check https://github.com/ffmpegwasm/ffmpeg.wasm -->
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+
+    <script>
+        const { createFFmpeg, fetchFile } = FFmpeg;
+        let ffmpeg; // Initialize later
+        let ffmpegLoaded = false;
+        let isProcessing = false;
+
+        // DOM Elements
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const mainContent = document.getElementById('mainContent');
+        const videoFileInput = document.getElementById('videoFile');
+        const audioFileInput = document.getElementById('audioFile');
+        const combineButton = document.getElementById('combineButton');
+        const statusArea = document.getElementById('statusArea');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const etrText = document.getElementById('etrText'); // Estimated Time Remaining
+        const logOutput = document.getElementById('logOutput');
+        const outputArea = document.getElementById('outputArea');
+        const downloadLink = document.getElementById('downloadLink');
+        const errorArea = document.getElementById('errorArea');
+        const errorMessage = document.getElementById('errorMessage');
+
+        let currentVideoFile = null;
+        let currentAudioFile = null;
+        let startTime = 0; // For ETR calculation
+
+        // --- FFMPEG Initialization ---
+        async function loadFFmpeg() {
+            try {
+                console.log("Creating FFMPEG instance...");
+                ffmpeg = createFFmpeg({
+                    log: true, // Enable logging to console and logger callback
+                    // corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js', // Optional: specify core path
+                });
+                console.log("Loading FFMPEG core...");
+                await ffmpeg.load();
+                console.log("FFMPEG core loaded.");
+                ffmpegLoaded = true;
+                loadingIndicator.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                updateCombineButtonState();
+
+                // Setup logger callback
+                ffmpeg.setLogger(({ type, message }) => {
+                    // console.log(`FFMPEG [${type}]: ${message}`); // Optional: keep logging to console
+                    if (isProcessing && message) {
+                       logOutput.textContent += message + '\n';
+                       logOutput.scrollTop = logOutput.scrollHeight; // Auto-scroll
+                    }
+                });
+
+                // Setup progress callback
+                ffmpeg.setProgress(({ ratio, time }) => {
+                    if (isProcessing) {
+                        const percentage = Math.max(0, Math.min(100, Math.round(ratio * 100)));
+                        progressBar.value = percentage;
+                        progressText.textContent = `${percentage}%`;
+
+                        // Calculate ETR
+                        if (ratio > 0 && ratio < 1 && time) {
+                             const currentTime = performance.now();
+                             const elapsedTime = (currentTime - startTime) / 1000; // seconds
+                             const estimatedTotalTime = elapsedTime / ratio;
+                             const remainingTime = Math.max(0, Math.round(estimatedTotalTime - elapsedTime)); // seconds
+                             etrText.textContent = ` | ETA: ${formatTime(remainingTime)}`;
+                        } else if (ratio === 1) {
+                             etrText.textContent = ` | Finishing...`;
+                        } else {
+                             etrText.textContent = ''; // No ETR yet
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error loading FFMPEG:", error);
+                loadingIndicator.textContent = "Error loading FFMPEG library. Please refresh the page or check the console.";
+                showError("Failed to load the required FFMPEG library. Please try refreshing the page.");
+            }
+        }
+
+        // --- Utility Functions ---
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.round(seconds % 60);
+            const paddedSeconds = remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds;
+            return `${minutes}:${paddedSeconds}`;
+        }
+
+        function getFileExtension(filename) {
+            return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2).toLowerCase();
+        }
+
+        function resetUI() {
+            statusArea.classList.add('hidden');
+            outputArea.classList.add('hidden');
+            errorArea.classList.add('hidden');
+            logOutput.textContent = '';
+            logOutput.classList.add('hidden'); // Hide log by default on new run
+            progressBar.value = 0;
+            progressText.textContent = '0%';
+            etrText.textContent = '';
+            downloadLink.href = '#'; // Clear previous link
+            isProcessing = false;
+            updateCombineButtonState();
+        }
+
+        function showStatus(showLog = false) {
+            hideError();
+            outputArea.classList.add('hidden');
+            statusArea.classList.remove('hidden');
+            if (showLog) {
+                logOutput.classList.remove('hidden');
+            } else {
+                logOutput.classList.add('hidden');
+            }
+        }
+
+        function showOutput() {
+            statusArea.classList.add('hidden');
+            hideError();
+            outputArea.classList.remove('hidden');
+        }
+
+        function showError(message) {
+             statusArea.classList.add('hidden');
+             outputArea.classList.add('hidden');
+             errorMessage.textContent = message;
+             errorArea.classList.remove('hidden');
+        }
+        function hideError() {
+            errorArea.classList.add('hidden');
+            errorMessage.textContent = '';
+        }
+
+
+        function updateCombineButtonState() {
+            combineButton.disabled = !ffmpegLoaded || isProcessing || !currentVideoFile || !currentAudioFile;
+        }
+
+        // --- Event Handlers ---
+        videoFileInput.addEventListener('change', (e) => {
+            currentVideoFile = e.target.files[0];
+            console.log("Video file selected:", currentVideoFile?.name);
+            updateCombineButtonState();
+            resetUI(); // Reset if files change after a run
+        });
+
+        audioFileInput.addEventListener('change', (e) => {
+            currentAudioFile = e.target.files[0];
+            console.log("Audio file selected:", currentAudioFile?.name);
+            updateCombineButtonState();
+            resetUI(); // Reset if files change after a run
+        });
+
+        combineButton.addEventListener('click', async () => {
+            if (!currentVideoFile || !currentAudioFile || !ffmpegLoaded || isProcessing) {
+                return;
+            }
+
+            isProcessing = true;
+            startTime = performance.now(); // Record start time for ETR
+            resetUI(); // Clear previous results/errors
+            showStatus(true); // Show progress and the log immediately
+            updateCombineButtonState(); // Disable button
+
+            const videoFileName = `input_video.${getFileExtension(currentVideoFile.name)}`;
+            const audioFileName = `input_audio.${getFileExtension(currentAudioFile.name)}`;
+            const outputFileName = 'output.mp4';
+
+            try {
+                console.log("Starting file processing...");
+                logOutput.textContent = "Loading files into FFMPEG's virtual filesystem...\n";
+
+                // Write files to FFMPEG virtual file system
+                ffmpeg.FS('writeFile', videoFileName, await fetchFile(currentVideoFile));
+                logOutput.textContent += ` - Video file (${currentVideoFile.name}) loaded as ${videoFileName}\n`;
+                ffmpeg.FS('writeFile', audioFileName, await fetchFile(currentAudioFile));
+                 logOutput.textContent += ` - Audio file (${currentAudioFile.name}) loaded as ${audioFileName}\n\n`;
+                logOutput.textContent += "Starting FFMPEG command...\n";
+                logOutput.scrollTop = logOutput.scrollHeight;
+
+
+                console.log(`Running FFMPEG command: -i ${videoFileName} -i ${audioFileName} -c:v copy -c:a aac -map 0:v:0 -map 1:a:0 -shortest ${outputFileName}`);
+
+                // Run the FFMPEG command
+                await ffmpeg.run(
+                    '-i', videoFileName,       // Input video file
+                    '-i', audioFileName,       // Input audio file
+                    '-c:v', 'copy',            // Copy video stream (no re-encoding)
+                    '-c:a', 'aac',             // Encode audio to AAC (good compatibility)
+                    '-map', '0:v:0',           // Map video stream from first input
+                    '-map', '1:a:0',           // Map audio stream from second input (replace original audio)
+                    '-shortest',               // Finish when the shortest input ends
+                    outputFileName             // Output file name
+                );
+
+                console.log("FFMPEG processing finished.");
+                logOutput.textContent += "\nFFMPEG processing finished.\nReading output file...";
+                logOutput.scrollTop = logOutput.scrollHeight;
+
+                // Read the processed file data
+                const data = ffmpeg.FS('readFile', outputFileName);
+
+                console.log("Output file read, size:", data.length);
+                 logOutput.textContent += `\nOutput file size: ${Math.round(data.length / 1024 / 1024 * 100)/100} MB`;
+                 logOutput.scrollTop = logOutput.scrollHeight;
+
+
+                // Create a Blob and URL for download
+                const blob = new Blob([data.buffer], { type: 'video/mp4' });
+                const url = URL.createObjectURL(blob);
+
+                downloadLink.href = url;
+                downloadLink.download = `combined_${currentVideoFile.name.replace(/\.[^/.]+$/, "")}.mp4`; // Suggest a download name
+
+                showOutput(); // Show download link
+
+                // Cleanup virtual filesystem (optional but good practice)
+                try {
+                     ffmpeg.FS('unlink', videoFileName);
+                     ffmpeg.FS('unlink', audioFileName);
+                     ffmpeg.FS('unlink', outputFileName);
+                     console.log("Cleaned up virtual filesystem.");
+                 } catch (cleanupError) {
+                     console.warn("Could not cleanup virtual filesystem:", cleanupError);
+                     logOutput.textContent += "\nWarning: Could not cleanup temporary files in virtual filesystem.";
+                 }
+
+
+            } catch (error) {
+                console.error("Error during FFMPEG processing:", error);
+                showError(`An error occurred: ${error.message || error}. Check log for details.`);
+                logOutput.textContent += `\n\n--- ERROR ---\n${error}\n-------------\n`;
+                logOutput.scrollTop = logOutput.scrollHeight;
+
+
+            } finally {
+                // Ensure state is reset correctly regardless of success/failure
+                isProcessing = false;
+                updateCombineButtonState(); // Re-enable button if applicable
+                 // Keep progress bar at 100% if successful, otherwise it's handled by resetUI/showError
+                 if (!errorArea.classList.contains('hidden')) {
+                     // If there was an error, ensure progress bar doesn't show 100%
+                     progressBar.value = 0;
+                     progressText.textContent = '0%';
+                     etrText.textContent = '';
+                 } else if (!outputArea.classList.contains('hidden')) {
+                     // If successful, keep progress at 100%
+                     progressBar.value = 100;
+                     progressText.textContent = '100%';
+                     etrText.textContent = ' | Done!';
+                 }
+            }
+        });
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFFmpeg();
+        });
+
+    </script>
+
+</body>
+</html>
