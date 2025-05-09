@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CRM Contact Gallery</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f5f5f5; /* Light page background */
+            color: #4a4a4a; /* Default dark text color for the body */
+        }
+        .crm-app-container {
+            background-color: white; /* White background for the main app area */
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 0.5em 1em -0.125em rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.02);
+            color: #4a4a4a; /* Default text color for content within this container */
+        }
+
+        /* Ensure headings and labels inside the white container are dark and readable */
+        .crm-app-container .label,
+        .crm-app-container > .section > .title.is-3, /* Main "CRM Contacts" title */
+        .crm-app-container > .section > .subtitle.is-5 { /* "Filters" subtitle */
+            color: #363636; /* Bulma's stronger text color */
+        }
+
+        /* Styling for search input and filter dropdowns */
+        .crm-app-container .input.crm-global-search-input,
+        .crm-app-container .select select {
+            background-color: white;
+            border-color: #dbdbdb; /* Bulma's default border color for inputs */
+            color: #363636;      /* Bulma's default input text color */
+        }
+        .crm-app-container .input.crm-global-search-input::placeholder {
+            color: #a5a5a5; /* Standard placeholder color */
+        }
+        /* Ensure dropdown options are also styled (though largely browser-controlled) */
+        .crm-app-container .select select option {
+            background-color: white;
+            color: #363636;
+        }
+        /* Style the arrow for the select dropdown */
+        .crm-app-container .select:not(.is-multiple):not(.is-loading)::after {
+             border-color: #3273dc; /* Bulma's primary color for the arrow */
+        }
+
+
+        .crm-contact-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: white; /* Explicitly white background for cards */
+            border: 1px solid #e0e0e0; /* A light border for definition */
+            box-shadow: 0 2px 3px rgba(10,10,10,.05), 0 0 0 1px rgba(10,10,10,.02); /* Subtle shadow */
+        }
+        .crm-contact-card .card-content {
+            flex-grow: 1;
+            color: #4a4a4a; /* Default text color for card content */
+        }
+        /* Ensure text within the card is dark and readable */
+        .crm-contact-card .media-content .title.is-5 { /* Name on card */
+            color: #363636; /* Darker color for the name */
+        }
+        .crm-contact-card .media-content .subtitle.is-6 { /* Company on card */
+            color: #4a4a4a; /* Standard dark text for company */
+        }
+        .crm-contact-card .content p {
+            margin-bottom: 0.3rem;
+            color: #4a4a4a; /* Ensure paragraph text is dark */
+        }
+        .crm-contact-card .content p span:not(.tag) {
+             color: #4a4a4a; /* Ensure span text (the data value) is dark */
+        }
+        .crm-contact-card .content p small { /* "Email:", "Phone:" labels within card */
+            color: #7a7a7a; /* Slightly lighter grey for these labels, but still readable */
+        }
+        /* Status tags are handled by getStatusTagClass and Bulma's color classes, which should be fine */
+
+
+        /* Original layout styles - generally okay */
+        .filter-controls-container .column {
+            padding-top: 0.75rem;
+            padding-bottom: 0;
+        }
+        .crm-search-section, .crm-filters-section, .crm-gallery-section {
+            padding-left: 0;
+            padding-right: 0;
+        }
+        .crm-search-section { padding-bottom: 0.5rem; }
+        .crm-filters-section { padding-top: 0.5rem; padding-bottom: 1.5rem; }
+        .crm-gallery-section { padding-top: 0.5rem; }
+
+        /* Custom classes (already present, for potential specific JS targeting or further styling) */
+        .crm-global-search-input {}
+        .crm-filter-select {}
+        .crm-filter-status {}
+        .crm-filter-industry {}
+        .crm-filter-assigned-to {}
+        .crm-filter-country {}
+        .crm-gallery-container {}
+    </style>
+</head>
+<body>
+    <div class="container crm-app-container">
+        <section class="section crm-search-section">
+            <h1 class="title is-3">CRM Contacts</h1>
+            <div class="field crm-search-controls-container">
+                <label class="label" for="crm-search-input">Search Contacts</label>
+                <div class="control">
+                    <input class="input is-medium crm-global-search-input" type="text" id="crm-search-input"
+                           placeholder="Search by name, company, email, status, etc..."
+                           aria-label="Search all CRM contact fields" data-label="global_crm_search_field">
+                </div>
+            </div>
+        </section>
+
+        <section class="section crm-filters-section">
+            <h2 class="subtitle is-5">Filters</h2>
+            <div class="columns is-multiline filter-controls-container">
+                <!-- Filter for Status -->
+                <div class="column is-narrow">
+                    <div class="field">
+                        <label class="label is-small" for="crm-filter-status">Status</label>
+                        <div class="control">
+                            <div class="select is-small crm-filter-select crm-filter-status">
+                                <select id="crm-filter-status" aria-label="Filter contacts by status" data-label="crm_contact_status_filter">
+                                    <option value="">All Statuses</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Filter for Industry -->
+                <div class="column is-narrow">
+                    <div class="field">
+                        <label class="label is-small" for="crm-filter-industry">Industry</label>
+                        <div class="control">
+                            <div class="select is-small crm-filter-select crm-filter-industry">
+                                <select id="crm-filter-industry" aria-label="Filter contacts by industry" data-label="crm_contact_industry_filter">
+                                    <option value="">All Industries</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Filter for Assigned To -->
+                <div class="column is-narrow">
+                    <div class="field">
+                        <label class="label is-small" for="crm-filter-assigned-to">Assigned To</label>
+                        <div class="control">
+                            <div class="select is-small crm-filter-select crm-filter-assigned-to">
+                                <select id="crm-filter-assigned-to" aria-label="Filter contacts by assigned sales representative" data-label="crm_contact_assigned_to_filter">
+                                    <option value="">All Reps</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Filter for Country -->
+                <div class="column is-narrow">
+                    <div class="field">
+                        <label class="label is-small" for="crm-filter-country">Country</label>
+                        <div class="control">
+                            <div class="select is-small crm-filter-select crm-filter-country">
+                                <select id="crm-filter-country" aria-label="Filter contacts by country" data-label="crm_contact_country_filter">
+                                    <option value="">All Countries</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section crm-gallery-section">
+             <p id="crm-results-count" class="is-size-6 mb-3"></p>
+            <div id="crm-contact-gallery" class="columns is-multiline crm-gallery-container">
+                <!-- Contact cards will be rendered here by JavaScript -->
+            </div>
+            <div id="crm-no-results-message" class="has-text-centered is-hidden py-5">
+                <p class="is-size-5">No contacts match your criteria.</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const crmData = [
+            { id: 1, name: "Alice Smith", company: "Innovatech", email: "alice.smith@innovatech.com", phone: "555-0101", status: "New", industry: "Technology", assignedTo: "Sarah P.", city: "New York", country: "USA", lastContactDate: "2023-10-01" },
+            { id: 2, name: "Bob Johnson", company: "Solutions Inc.", email: "bob.johnson@solutions.com", phone: "555-0102", status: "Contacted", industry: "Healthcare", assignedTo: "John D.", city: "London", country: "UK", lastContactDate: "2023-10-05" },
+            { id: 3, name: "Carol Williams", company: "Alpha Corp", email: "carol.williams@alphacorp.com", phone: "555-0103", status: "Qualified", industry: "Finance", assignedTo: "Emily K.", city: "Berlin", country: "Germany", lastContactDate: "2023-09-28" },
+            { id: 4, name: "David Brown", company: "Beta LLC", email: "david.brown@betallc.com", phone: "555-0104", status: "Proposal Sent", industry: "Retail", assignedTo: "Michael B.", city: "Paris", country: "France", lastContactDate: "2023-10-10" },
+            { id: 5, name: "Eve Jones", company: "Gamma Co.", email: "eve.jones@gammaco.com", phone: "555-0105", status: "Negotiation", industry: "Manufacturing", assignedTo: "Sarah P.", city: "Tokyo", country: "Japan", lastContactDate: "2023-09-15" },
+            { id: 6, name: "Frank Garcia", company: "Delta Industries", email: "frank.garcia@deltaind.com", phone: "555-0106", status: "Won", industry: "Education", assignedTo: "John D.", city: "Sydney", country: "Australia", lastContactDate: "2023-08-20" },
+            { id: 7, name: "Grace Miller", company: "Epsilon Group", email: "grace.miller@epsilongrp.com", phone: "555-0107", status: "Lost", industry: "Real Estate", assignedTo: "Emily K.", city: "Toronto", country: "Canada", lastContactDate: "2023-07-25" },
+            { id: 8, name: "Henry Davis", company: "Zeta Solutions", email: "henry.davis@zetasol.com", phone: "555-0108", status: "On Hold", industry: "Marketing", assignedTo: "Michael B.", city: "Mumbai", country: "India", lastContactDate: "2023-09-01" },
+            { id: 9, name: "Irene Rodriguez", company: "Eta Innovations", email: "irene.rodriguez@etainnov.com", phone: "555-0109", status: "New", industry: "Technology", assignedTo: "Sarah P.", city: "São Paulo", country: "Brazil", lastContactDate: "2023-10-12" },
+            { id: 10, name: "Jack Wilson", company: "Theta Systems", email: "jack.wilson@thetasys.com", phone: "555-0110", status: "Contacted", industry: "Consulting", assignedTo: "John D.", city: "Cape Town", country: "South Africa", lastContactDate: "2023-10-08" },
+            { id: 11, name: "Kate Martinez", company: "Iota Tech", email: "kate.martinez@iotatech.com", phone: "555-0111", status: "Qualified", industry: "Non-profit", assignedTo: "Emily K.", city: "Dubai", country: "UAE", lastContactDate: "2023-09-22" },
+            { id: 12, name: "Liam Anderson", company: "Kappa Digital", email: "liam.anderson@kappadig.com", phone: "555-0112", status: "Proposal Sent", industry: "Technology", assignedTo: "Michael B.", city: "Singapore", country: "Singapore", lastContactDate: "2023-10-03" },
+            { id: 13, name: "Mia Thomas", company: "Lambda Services", email: "mia.thomas@lambdaserv.com", phone: "555-0113", status: "Negotiation", industry: "Healthcare", assignedTo: "Sarah P.", city: "Moscow", country: "Russia", lastContactDate: "2023-09-18" },
+            { id: 14, name: "Noah Jackson", company: "Mu Dynamics", email: "noah.jackson@mudyn.com", phone: "555-0114", status: "Won", industry: "Finance", assignedTo: "John D.", city: "Rome", country: "Italy", lastContactDate: "2023-08-15" },
+            { id: 15, name: "Olivia White", company: "Nu Creations", email: "olivia.white@nucreate.com", phone: "555-0115", status: "New", industry: "Retail", assignedTo: "Emily K.", city: "Madrid", country: "Spain", lastContactDate: "2023-10-11" },
+            { id: 16, name: "Peter Harris", company: "Xi Enterprises", email: "peter.harris@xient.com", phone: "555-0116", status: "Contacted", industry: "Manufacturing", assignedTo: "Michael B.", city: "Amsterdam", country: "Netherlands", lastContactDate: "2023-10-07" },
+            { id: 17, name: "Quinn Lee", company: "Omicron Software", email: "quinn.lee@omicronsoft.com", phone: "555-0117", status: "Qualified", industry: "Education", assignedTo: "Sarah P.", city: "Zurich", country: "Switzerland", lastContactDate: "2023-09-25" },
+            { id: 18, name: "Ryan Walker", company: "Pi Analytics", email: "ryan.walker@pianalytics.com", phone: "555-0118", status: "Proposal Sent", industry: "Real Estate", assignedTo: "John D.", city: "Stockholm", country: "Sweden", lastContactDate: "2023-10-09" },
+            { id: 19, name: "Sophia Hall", company: "Rho Ventures", email: "sophia.hall@rhovent.com", phone: "555-0119", status: "Negotiation", industry: "Marketing", assignedTo: "Emily K.", city: "Oslo", country: "Norway", lastContactDate: "2023-09-12" },
+            { id: 20, name: "Tyler Allen", company: "Sigma Global", email: "tyler.allen@sigmaglobal.com", phone: "555-0120", status: "Won", industry: "Technology", assignedTo: "Michael B.", city: "Helsinki", country: "Finland", lastContactDate: "2023-08-28" },
+            { id: 21, name: "Uma Young", company: "Tau Consulting", email: "uma.young@tauconsult.com", phone: "555-0121", status: "New", industry: "Consulting", assignedTo: "Sarah P.", city: "Dublin", country: "Ireland", lastContactDate: "2023-10-13" },
+            { id: 22, name: "Victor King", company: "Upsilon Media", email: "victor.king@upsilonmed.com", phone: "555-0122", status: "Contacted", industry: "Non-profit", assignedTo: "John D.", city: "Vienna", country: "Austria", lastContactDate: "2023-10-06" }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('crm-search-input');
+            const statusFilter = document.getElementById('crm-filter-status');
+            const industryFilter = document.getElementById('crm-filter-industry');
+            const assignedToFilter = document.getElementById('crm-filter-assigned-to');
+            const countryFilter = document.getElementById('crm-filter-country');
+            const gallery = document.getElementById('crm-contact-gallery');
+            const noResultsMessage = document.getElementById('crm-no-results-message');
+            const resultsCountMessage = document.getElementById('crm-results-count');
+
+            const searchableFields = ['name', 'company', 'email', 'phone', 'status', 'industry', 'assignedTo', 'city', 'country'];
+
+            function getStatusTagClass(status) {
+                if (!status) return 'is-light';
+                switch (status.toLowerCase()) {
+                    case 'new': return 'is-primary';
+                    case 'contacted': return 'is-link';
+                    case 'qualified': return 'is-info';
+                    case 'proposal sent': return 'is-info is-light';
+                    case 'negotiation': return 'is-warning';
+                    case 'won': return 'is-success';
+                    case 'lost': return 'is-danger';
+                    case 'on hold': return 'is-warning is-light';
+                    default: return 'is-light';
+                }
+            }
+
+            function populateFilters() {
+                const statuses = [...new Set(crmData.map(contact => contact.status))].sort();
+                const industries = [...new Set(crmData.map(contact => contact.industry))].sort();
+                const assignedTos = [...new Set(crmData.map(contact => contact.assignedTo))].sort();
+                const countries = [...new Set(crmData.map(contact => contact.country))].sort();
+
+                statuses.forEach(status => {
+                    const option = document.createElement('option');
+                    option.value = status;
+                    option.textContent = status;
+                    statusFilter.appendChild(option);
+                });
+                industries.forEach(industry => {
+                    const option = document.createElement('option');
+                    option.value = industry;
+                    option.textContent = industry;
+                    industryFilter.appendChild(option);
+                });
+                assignedTos.forEach(assigned => {
+                    const option = document.createElement('option');
+                    option.value = assigned;
+                    option.textContent = assigned;
+                    assignedToFilter.appendChild(option);
+                });
+                countries.forEach(country => {
+                    const option = document.createElement('option');
+                    option.value = country;
+                    option.textContent = country;
+                    countryFilter.appendChild(option);
+                });
+            }
+
+            function renderContacts(contactsToDisplay) {
+                gallery.innerHTML = '';
+
+                if (contactsToDisplay.length === 0) {
+                    noResultsMessage.classList.remove('is-hidden');
+                    resultsCountMessage.textContent = '0 contacts found.';
+                    return;
+                }
+                noResultsMessage.classList.add('is-hidden');
+                resultsCountMessage.textContent = `${contactsToDisplay.length} contact${contactsToDisplay.length === 1 ? '' : 's'} found.`;
+
+
+                contactsToDisplay.forEach(contact => {
+                    const cardColumn = document.createElement('div');
+                    cardColumn.className = 'column is-one-quarter-desktop is-one-third-tablet is-full-mobile';
+
+                    const card = document.createElement('div');
+                    card.className = 'card crm-contact-card';
+
+                    card.innerHTML = `
+                        <div class="card-content">
+                            <div class="media">
+                                <div class="media-content">
+                                    <p class="title is-5" data-field="name">${contact.name}</p>
+                                    <p class="subtitle is-6" data-field="company">${contact.company}</p>
+                                </div>
+                            </div>
+                            <div class="content">
+                                <p><small>Email:</small> <span data-field="email">${contact.email}</span></p>
+                                <p><small>Phone:</small> <span data-field="phone">${contact.phone}</span></p>
+                                <p><small>Status:</small> <span class="tag ${getStatusTagClass(contact.status)}" data-field="status">${contact.status}</span></p>
+                                <p><small>Industry:</small> <span data-field="industry">${contact.industry}</span></p>
+                                <p><small>Assigned:</small> <span data-field="assignedTo">${contact.assignedTo}</span></p>
+                                <p><small>Location:</small> <span data-field="city">${contact.city}</span>, <span data-field="country">${contact.country}</span></p>
+                                <p><small>Last Contact:</small> <span data-field="lastContactDate">${contact.lastContactDate}</span></p>
+                            </div>
+                        </div>
+                    `;
+                    cardColumn.appendChild(card);
+                    gallery.appendChild(cardColumn);
+                });
+            }
+
+            function filterAndSearchContacts() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedStatus = statusFilter.value;
+                const selectedIndustry = industryFilter.value;
+                const selectedAssignedTo = assignedToFilter.value;
+                const selectedCountry = countryFilter.value;
+
+                let filteredContacts = crmData;
+
+                if (searchTerm) {
+                    filteredContacts = filteredContacts.filter(contact => {
+                        return searchableFields.some(field => {
+                            const value = contact[field];
+                            return value && String(value).toLowerCase().includes(searchTerm);
+                        });
+                    });
+                }
+
+                if (selectedStatus) {
+                    filteredContacts = filteredContacts.filter(contact => contact.status === selectedStatus);
+                }
+                if (selectedIndustry) {
+                    filteredContacts = filteredContacts.filter(contact => contact.industry === selectedIndustry);
+                }
+                if (selectedAssignedTo) {
+                    filteredContacts = filteredContacts.filter(contact => contact.assignedTo === selectedAssignedTo);
+                }
+                if (selectedCountry) {
+                    filteredContacts = filteredContacts.filter(contact => contact.country === selectedCountry);
+                }
+
+                renderContacts(filteredContacts);
+            }
+
+            searchInput.addEventListener('input', filterAndSearchContacts);
+            statusFilter.addEventListener('change', filterAndSearchContacts);
+            industryFilter.addEventListener('change', filterAndSearchContacts);
+            assignedToFilter.addEventListener('change', filterAndSearchContacts);
+            countryFilter.addEventListener('change', filterAndSearchContacts);
+
+            populateFilters();
+            filterAndSearchContacts();
+        });
+    </script>
+</body>
+</html>
