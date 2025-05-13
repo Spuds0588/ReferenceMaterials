@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editable Fields Test Page</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <style>
+        body {
+            padding: 20px;
+            font-family: sans-serif;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+        .field-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+        }
+        .field-section h2 {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #dbdbdb;
+            padding-bottom: 10px;
+        }
+        .output-area {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 50px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+        .success-message {
+            color: green;
+            font-weight: bold;
+        }
+        .event-log {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">Comprehensive Editable Fields Test Page</h1>
+            <p class="subtitle">Used for testing interactions with various input and contenteditable fields.</p>
+
+            <!-- Common Input Types Section -->
+            <div class="field-section">
+                <h2 class="title is-4">Common Input Types</h2>
+
+                <!-- Text Input -->
+                <div class="field">
+                    <label class="label" for="textInput">Text Input (<code>type="text"</code>)</label>
+                    <div class="control">
+                        <input class="input" type="text" id="textInput" placeholder="Enter text here">
+                    </div>
+                    <div class="output-area" id="textInputOutput"></div>
+                    <div class="event-log" id="textInputEventLog"></div>
+                </div>
+
+                <!-- Password Input -->
+                <div class="field">
+                    <label class="label" for="passwordInput">Password Input (<code>type="password"</code>)</label>
+                    <div class="control">
+                        <input class="input" type="password" id="passwordInput" placeholder="Enter password">
+                    </div>
+                    <div class="output-area" id="passwordInputOutput"></div>
+                    <div class="event-log" id="passwordInputEventLog"></div>
+                </div>
+
+                <!-- Email Input -->
+                <div class="field">
+                    <label class="label" for="emailInput">Email Input (<code>type="email"</code>)</label>
+                    <div class="control">
+                        <input class="input" type="email" id="emailInput" placeholder="Enter email">
+                    </div>
+                    <div class="output-area" id="emailInputOutput"></div>
+                    <div class="event-log" id="emailInputEventLog"></div>
+                </div>
+
+                <!-- Number Input -->
+                <div class="field">
+                    <label class="label" for="numberInput">Number Input (<code>type="number"</code>)</label>
+                    <div class="control">
+                        <input class="input" type="number" id="numberInput" placeholder="Enter a number">
+                    </div>
+                    <div class="output-area" id="numberInputOutput"></div>
+                    <div class="event-log" id="numberInputEventLog"></div>
+                </div>
+
+                <!-- Textarea -->
+                <div class="field">
+                    <label class="label" for="textareaInput">Textarea</label>
+                    <div class="control">
+                        <textarea class="textarea" id="textareaInput" placeholder="Enter multiple lines of text"></textarea>
+                    </div>
+                    <div class="output-area" id="textareaInputOutput"></div>
+                    <div class="event-log" id="textareaInputEventLog"></div>
+                </div>
+
+                <!-- Checkbox -->
+                <div class="field">
+                    <label class="label">Checkbox (<code>type="checkbox"</code>)</label>
+                    <div class="control">
+                        <label class="checkbox">
+                            <input type="checkbox" id="checkboxInput">
+                            I agree to the terms
+                        </label>
+                    </div>
+                    <div class="output-area" id="checkboxInputOutput"></div>
+                    <div class="event-log" id="checkboxInputEventLog"></div>
+                </div>
+
+                <!-- Radio Buttons -->
+                <div class="field">
+                    <label class="label">Radio Buttons (<code>type="radio"</code>)</label>
+                    <div class="control">
+                        <label class="radio">
+                            <input type="radio" name="radioGroup" id="radioOption1" value="Option 1">
+                            Option 1
+                        </label>
+                        <label class="radio">
+                            <input type="radio" name="radioGroup" id="radioOption2" value="Option 2">
+                            Option 2
+                        </label>
+                    </div>
+                    <div class="output-area" id="radioInputOutput"></div>
+                    <div class="event-log" id="radioInputEventLog"></div>
+                </div>
+
+                <!-- Select Dropdown -->
+                <div class="field">
+                    <label class="label" for="selectInput">Select Dropdown</label>
+                    <div class="control">
+                        <div class="select">
+                            <select id="selectInput">
+                                <option value="">Select dropdown</option>
+                                <option value="Option A">Option A</option>
+                                <option value="Option B">Option B</option>
+                                <option value="Option C">Option C</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="output-area" id="selectInputOutput"></div>
+                    <div class="event-log" id="selectInputEventLog"></div>
+                </div>
+            </div>
+
+            <!-- Less Common Input Types Section -->
+            <div class="field-section">
+                <h2 class="title is-4">Less Common Input Types</h2>
+
+                <!-- Date Input -->
+                <div class="field">
+                    <label class="label" for="dateInput">Date Input (<code>type="date"</code>)</label>
+                    <div class="control">
+                        <input class="input" type="date" id="dateInput">
+                    </div>
+                    <div class="output-area" id="dateInputOutput"></div>
+                    <div class="event-log" id="dateInputEventLog"></div>
+                </div>
+
+                <!-- Time Input -->
+                <div class="field">
+                    <label class="label" for="timeInput">Time Input (<code>type="time"</code>)</label>
+                    <div class="control">
+                        <input class="input" type="time" id="timeInput">
+                    </div>
+                    <div class="output-area" id="timeInputOutput"></div>
+                    <div class="event-log" id="timeInputEventLog"></div>
+                </div>
+
+                <!-- Datetime-local Input -->
+                <div class="field">
+                    <label class="label" for="datetimeLocalInput">Datetime-local Input (<code>type="datetime-local"</code>)</label>
+                    <div class="control">
+                        <input class="input" type="datetime-local" id="datetimeLocalInput">
+                    </div>
+                    <div class="output-area" id="datetimeLocalInputOutput"></div>
+                    <div class="event-log" id="datetimeLocalInputEventLog"></div>
+                </div>
+
+                <!-- Month Input -->
+                <div class="field">
+                    <label class="label" for="monthInput">Month Input (<code>type="month"</code>)</label>
+                    <div class="control">
+                        <input class="input" type="month" id="monthInput">
+                    </div>
+                    <div class="output-area" id="monthInputOutput"></div>
+                    <div class="event-log" id="monthInputEventLog"></div>
+                </div>
+
+                <!-- Week Input -->
+                <div class="field">
+                    <label class="label" for="weekInput">Week Input (<code>type="week"</code>)</label>
+                    <div class="control">
+                        <input class="input" type="week" id="weekInput">
+                    </div>
+                    <div class="output-area" id="weekInputOutput"></div>
+                    <div class="event-log" id="weekInputEventLog"></div>
+                </div>
+
+                <!-- Range Input -->
+                <div class="field">
+                    <label class="label" for="rangeInput">Range Input (<code>type="range"</code>)</label>
+                    <div class="control">
+                        <input class="input" type="range" id="rangeInput" min="0" max="100" value="50">
+                    </div>
+                    <div class="output-area" id="rangeInputOutput">Current value: 50</div>
+                    <div class="event-log" id="rangeInputEventLog"></div>
+                </div>
+
+                <!-- Color Input -->
+                <div class="field">
+                    <label class="label" for="colorInput">Color Input (<code>type="color"</code>)</label>
+                    <div class="control">
+                        <input class="input" type="color" id="colorInput" value="#ff0000" style="height: 40px; padding: 5px;">
+                    </div>
+                    <div class="output-area" id="colorInputOutput"></div>
+                    <div class="event-log" id="colorInputEventLog"></div>
+                </div>
+
+                <!-- Search Input -->
+                <div class="field">
+                    <label class="label" for="searchInput">Search Input (<code>type="search"</code>)</label>
+                    <div class="control">
+                        <input class="input" type="search" id="searchInput" placeholder="Search...">
+                    </div>
+                    <div class="output-area" id="searchInputOutput"></div>
+                    <div class="event-log" id="searchInputEventLog"></div>
+                </div>
+
+                <!-- Tel Input -->
+                <div class="field">
+                    <label class="label" for="telInput">Telephone Input (<code>type="tel"</code>)</label>
+                    <div class="control">
+                        <input class="input" type="tel" id="telInput" placeholder="e.g., 123-456-7890">
+                    </div>
+                    <div class="output-area" id="telInputOutput"></div>
+                    <div class="event-log" id="telInputEventLog"></div>
+                </div>
+
+                <!-- URL Input -->
+                <div class="field">
+                    <label class="label" for="urlInput">URL Input (<code>type="url"</code>)</label>
+                    <div class="control">
+                        <input class="input" type="url" id="urlInput" placeholder="e.g., https://example.com">
+                    </div>
+                    <div class="output-area" id="urlInputOutput"></div>
+                    <div class="event-log" id="urlInputEventLog"></div>
+                </div>
+
+                <!-- File Input -->
+                <div class="field">
+                    <label class="label" for="fileInput">File Input (<code>type="file"</code>)</label>
+                    <div class="control">
+                         <div class="file has-name">
+                            <label class="file-label">
+                                <input class="file-input" type="file" id="fileInput">
+                                <span class="file-cta">
+                                    <span class="file-icon">
+                                        <i class="fas fa-upload"></i> <!-- Needs Font Awesome if you want an icon -->
+                                    </span>
+                                    <span class="file-label">
+                                        Choose a file…
+                                    </span>
+                                </span>
+                                <span class="file-name" id="fileNameDisplay">
+                                    No file selected
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="output-area" id="fileInputOutput"></div>
+                    <div class="event-log" id="fileInputEventLog"></div>
+                </div>
+
+            </div>
+
+            <!-- Contenteditable Elements Section -->
+            <div class="field-section">
+                <h2 class="title is-4">Contenteditable Elements</h2>
+
+                <!-- Simple Contenteditable Div -->
+                <div class="field">
+                    <label class="label">Simple Editable Div (<code>contenteditable="true"</code>)</label>
+                    <div class="control">
+                        <div class="box contenteditable-div" id="editableDiv" contenteditable="true" style="min-height: 50px; border: 1px dashed #ccc; padding: 10px;">
+                            This is a div you can edit directly.
+                        </div>
+                    </div>
+                    <div class="output-area" id="editableDivOutput"></div>
+                    <div class="event-log" id="editableDivEventLog"></div>
+                </div>
+
+                <!-- Contenteditable Paragraph -->
+                <div class="field">
+                    <label class="label">Editable Paragraph (<code>contenteditable="true"</code>)</label>
+                    <div class="control">
+                        <p class="contenteditable-p" id="editableParagraph" contenteditable="true" style="border: 1px dashed #ccc; padding: 10px;">
+                            This paragraph is also editable. Try typing here!
+                        </p>
+                    </div>
+                    <div class="output-area" id="editableParagraphOutput"></div>
+                    <div class="event-log" id="editableParagraphEventLog"></div>
+                </div>
+
+                 <!-- Plaintext-only Contenteditable Div -->
+                <div class="field">
+                    <label class="label">Plaintext-only Editable Div (<code>contenteditable="plaintext-only"</code>)</label>
+                    <div class="control">
+                        <div class="box contenteditable-div" id="editableDivPlaintext" contenteditable="plaintext-only" style="min-height: 50px; border: 1px dashed #ccc; padding: 10px;">
+                            This div is editable, but only allows plaintext. Pasting rich text should strip formatting.
+                        </div>
+                    </div>
+                    <div class="output-area" id="editableDivPlaintextOutput"></div>
+                    <div class="event-log" id="editableDivPlaintextEventLog"></div>
+                </div>
+
+                <!-- Nested Contenteditable -->
+                <div class="field">
+                    <label class="label">Nested Contenteditable</label>
+                    <div class="control">
+                        <div class="box contenteditable-div" id="outerEditableDiv" contenteditable="true" style="min-height: 50px; border: 1px dashed #007bff; padding: 10px;">
+                            Outer editable area.
+                            <p id="innerNonEditableParagraph" contenteditable="false" style="border: 1px solid #dc3545; padding: 5px; margin-top:5px; background-color: #f8d7da;">This inner paragraph is NOT editable.</p>
+                            <div id="innerEditableDiv" contenteditable="true" style="min-height: 30px; border: 1px dashed #28a745; padding: 5px; margin-top:5px; background-color: #d4edda;">
+                                This inner div IS editable.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="output-area" id="nestedEditableOutput"></div>
+                    <div class="event-log" id="nestedEditableEventLog"></div>
+                </div>
+            </div>
+
+            <!-- Disabled and Readonly Fields -->
+            <div class="field-section">
+                <h2 class="title is-4">Disabled and Readonly Fields</h2>
+                 <div class="field">
+                    <label class="label" for="disabledTextInput">Disabled Text Input</label>
+                    <div class="control">
+                        <input class="input" type="text" id="disabledTextInput" placeholder="Cannot edit" disabled>
+                    </div>
+                    <div class="output-area" id="disabledTextInputOutput">Should not be interactive.</div>
+                </div>
+                <div class="field">
+                    <label class="label" for="readonlyTextInput">Readonly Text Input</label>
+                    <div class="control">
+                        <input class="input" type="text" id="readonlyTextInput" value="This is readonly" readonly>
+                    </div>
+                    <div class="output-area" id="readonlyTextInputOutput">Value can be selected/copied, but not changed.</div>
+                    <div class="event-log" id="readonlyTextInputEventLog"></div>
+                </div>
+                 <div class="field">
+                    <label class="label">Disabled Checkbox</label>
+                    <div class="control">
+                        <label class="checkbox" disabled>
+                            <input type="checkbox" id="disabledCheckboxInput" disabled>
+                            Cannot check this
+                        </label>
+                    </div>
+                </div>
+                 <div class="field">
+                    <label class="label">Disabled Radio</label>
+                    <div class="control">
+                        <label class="radio" disabled>
+                            <input type="radio" name="disabledRadioGroup" id="disabledRadioOption1" value="Disabled 1" disabled>
+                            Disabled Option 1
+                        </label>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label" for="disabledSelectInput">Disabled Select Dropdown</label>
+                    <div class="control">
+                        <div class="select is-disabled">
+                            <select id="disabledSelectInput" disabled>
+                                <option value="">Cannot select</option>
+                                <option value="Option A">Option A</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                 <div class="field">
+                    <label class="label">Disabled Contenteditable Div (<code>contenteditable="false"</code> on a previously editable div)</label>
+                    <div class="control">
+                        <div class="box" id="disabledEditableDiv" contenteditable="false" style="min-height: 50px; border: 1px dashed #ccc; padding: 10px; background-color: #eee;">
+                            This div has contenteditable set to false.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- General Console Output -->
+            <div class="field-section">
+                <h2 class="title is-4">General Console Log / Error Area</h2>
+                <div id="generalLog" class="output-area" style="max-height: 200px; overflow-y: auto;">
+                    Generic console messages will appear here...
+                </div>
+                <button class="button is-info mt-2" id="testLogButton">Log Info Message</button>
+                <button class="button is-warning mt-2" id="testWarnButton">Log Warning Message</button>
+                <button class="button is-danger mt-2" id="testErrorButton">Log Error Message</button>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const generalLogArea = document.getElementById('generalLog');
+
+            function logToGeneral(message, type = 'log') {
+                const entry = document.createElement('div');
+                entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                if (type === 'error') {
+                    entry.classList.add('error-message');
+                    console.error(message);
+                } else if (type === 'warn') {
+                    entry.classList.add('has-text-warning-dark'); // Bulma class for warning text
+                    console.warn(message);
+                } else {
+                    console.log(message);
+                }
+                generalLogArea.appendChild(entry);
+                generalLogArea.scrollTop = generalLogArea.scrollHeight; // Scroll to bottom
+            }
+
+            document.getElementById('testLogButton').addEventListener('click', () => {
+                logToGeneral('This is a test informational message.');
+            });
+            document.getElementById('testWarnButton').addEventListener('click', () => {
+                logToGeneral('This is a test warning message.', 'warn');
+            });
+            document.getElementById('testErrorButton').addEventListener('click', () => {
+                logToGeneral('This is a test error message.', 'error');
+            });
+
+
+            function setupInputListeners(inputId, outputId, eventLogId, isCheckboxOrRadio = false, isRange = false, isFile = false) {
+                const inputElement = document.getElementById(inputId);
+                const outputElement = document.getElementById(outputId);
+                const eventLogElement = document.getElementById(eventLogId);
+
+                if (!inputElement) {
+                    logToGeneral(`Error: Element with ID '${inputId}' not found.`, 'error');
+                    if(outputElement) outputElement.innerHTML = `<span class="error-message">Input element '${inputId}' not found!</span>`;
+                    return;
+                }
+                 if (!outputElement) {
+                    logToGeneral(`Error: Output element with ID '${outputId}' not found for input '${inputId}'.`, 'error');
+                }
+                if (!eventLogElement) {
+                    logToGeneral(`Error: Event log element with ID '${eventLogId}' not found for input '${inputId}'.`, 'error');
+                }
+
+
+                const eventsToLog = ['input', 'change', 'focus', 'blur', 'click', 'keyup', 'keydown', 'paste', 'cut'];
+
+                eventsToLog.forEach(eventType => {
+                    inputElement.addEventListener(eventType, (event) => {
+                        try {
+                            let value;
+                            if (isCheckboxOrRadio) {
+                                value = `${event.target.checked ? 'Checked' : 'Unchecked'} (Value: ${event.target.value || 'N/A'})`;
+                            } else if (isFile) {
+                                value = event.target.files && event.target.files.length > 0 ? event.target.files[0].name : 'No file selected';
+                                if (event.target.files && event.target.files.length > 0 && document.getElementById('fileNameDisplay')) {
+                                     document.getElementById('fileNameDisplay').textContent = event.target.files[0].name;
+                                } else if (document.getElementById('fileNameDisplay')) {
+                                     document.getElementById('fileNameDisplay').textContent = 'No file selected';
+                                }
+                            }
+                            else {
+                                value = event.target.value;
+                            }
+
+                            const logMsg = `Event: ${event.type}, Value: ${value}`;
+                            if (eventLogElement) eventLogElement.innerHTML = logMsg + '<br>' + eventLogElement.innerHTML.substring(0, 200); // Keep log short
+                            console.log(`Element ID: ${inputId}, ${logMsg}`);
+
+                            if (outputElement) {
+                                if (isRange) {
+                                    outputElement.textContent = `Current value: ${value}`;
+                                } else if (event.type === 'change' || event.type === 'input') {
+                                     outputElement.textContent = `Current value: ${value}`;
+                                }
+                            }
+                        } catch (e) {
+                            const errorMsg = `Error handling event ${event.type} for ${inputId}: ${e.message}`;
+                            if (outputElement) outputElement.innerHTML = `<span class="error-message">${errorMsg}</span>`;
+                            logToGeneral(errorMsg, 'error');
+                        }
+                    });
+                });
+
+                 // Initial value display for some inputs
+                if (outputElement) {
+                    if (isRange) {
+                         outputElement.textContent = `Current value: ${inputElement.value}`;
+                    } else if (inputElement.value) {
+                         outputElement.textContent = `Initial value: ${inputElement.value}`;
+                    } else if (isCheckboxOrRadio) {
+                        outputElement.textContent = `Initial state: ${inputElement.checked ? 'Checked' : 'Unchecked'}`;
+                    }
+                }
+            }
+
+            function setupContentEditableListeners(elementId, outputId, eventLogId) {
+                const editableElement = document.getElementById(elementId);
+                const outputElement = document.getElementById(outputId);
+                const eventLogElement = document.getElementById(eventLogId);
+
+                if (!editableElement) {
+                    logToGeneral(`Error: Contenteditable element with ID '${elementId}' not found.`, 'error');
+                     if(outputElement) outputElement.innerHTML = `<span class="error-message">Editable element '${elementId}' not found!</span>`;
+                    return;
+                }
+                if (!outputElement) {
+                    logToGeneral(`Error: Output element with ID '${outputId}' not found for contenteditable '${elementId}'.`, 'error');
+                }
+                if (!eventLogElement) {
+                    logToGeneral(`Error: Event log element with ID '${eventLogId}' not found for contenteditable '${elementId}'.`, 'error');
+                }
+
+                const eventsToLog = ['input', 'focus', 'blur', 'click', 'keyup', 'keydown', 'paste', 'cut'];
+
+                eventsToLog.forEach(eventType => {
+                    editableElement.addEventListener(eventType, (event) => {
+                        try {
+                            const content = event.target.innerHTML; // or innerText for plaintext
+                            const logMsg = `Event: ${event.type}, Current HTML Length: ${content.length}`;
+                            if (eventLogElement) eventLogElement.innerHTML = logMsg + '<br>' + eventLogElement.innerHTML.substring(0, 200);
+                            console.log(`Element ID: ${elementId}, ${logMsg}`);
+                            if (outputElement && (event.type === 'input' || event.type === 'paste' || event.type === 'cut')) {
+                                outputElement.textContent = `Current HTML content (first 100 chars): ${content.substring(0,100)}...`;
+                            }
+                        } catch (e) {
+                            const errorMsg = `Error handling event ${event.type} for ${elementId}: ${e.message}`;
+                            if (outputElement) outputElement.innerHTML = `<span class="error-message">${errorMsg}</span>`;
+                            logToGeneral(errorMsg, 'error');
+                        }
+                    });
+                });
+                 if (outputElement) {
+                    outputElement.textContent = `Initial HTML (first 100 chars): ${editableElement.innerHTML.substring(0,100)}...`;
+                }
+            }
+
+            // Common Inputs
+            setupInputListeners('textInput', 'textInputOutput', 'textInputEventLog');
+            setupInputListeners('passwordInput', 'passwordInputOutput', 'passwordInputEventLog');
+            setupInputListeners('emailInput', 'emailInputOutput', 'emailInputEventLog');
+            setupInputListeners('numberInput', 'numberInputOutput', 'numberInputEventLog');
+            setupInputListeners('textareaInput', 'textareaInputOutput', 'textareaInputEventLog');
+            setupInputListeners('checkboxInput', 'checkboxInputOutput', 'checkboxInputEventLog', true);
+            setupInputListeners('radioOption1', 'radioInputOutput', 'radioInputEventLog', true); // Log for one, output shared
+            setupInputListeners('radioOption2', 'radioInputOutput', 'radioInputEventLog', true);
+            setupInputListeners('selectInput', 'selectInputOutput', 'selectInputEventLog');
+
+            // Less Common Inputs
+            setupInputListeners('dateInput', 'dateInputOutput', 'dateInputEventLog');
+            setupInputListeners('timeInput', 'timeInputOutput', 'timeInputEventLog');
+            setupInputListeners('datetimeLocalInput', 'datetimeLocalInputOutput', 'datetimeLocalInputEventLog');
+            setupInputListeners('monthInput', 'monthInputOutput', 'monthInputEventLog');
+            setupInputListeners('weekInput', 'weekInputOutput', 'weekInputEventLog');
+            setupInputListeners('rangeInput', 'rangeInputOutput', 'rangeInputEventLog', false, true);
+            setupInputListeners('colorInput', 'colorInputOutput', 'colorInputEventLog');
+            setupInputListeners('searchInput', 'searchInputOutput', 'searchInputEventLog');
+            setupInputListeners('telInput', 'telInputOutput', 'telInputEventLog');
+            setupInputListeners('urlInput', 'urlInputOutput', 'urlInputEventLog');
+            setupInputListeners('fileInput', 'fileInputOutput', 'fileInputEventLog', false, false, true);
+
+
+            // Contenteditable
+            setupContentEditableListeners('editableDiv', 'editableDivOutput', 'editableDivEventLog');
+            setupContentEditableListeners('editableParagraph', 'editableParagraphOutput', 'editableParagraphEventLog');
+            setupContentEditableListeners('editableDivPlaintext', 'editableDivPlaintextOutput', 'editableDivPlaintextEventLog');
+
+            // Nested Contenteditable - outer and inner editable parts need separate listeners if specific logging is needed for each.
+            // For simplicity, one listener on the outer div will capture events bubbling up.
+            // And a specific one for the inner editable div.
+            setupContentEditableListeners('outerEditableDiv', 'nestedEditableOutput', 'nestedEditableEventLog'); // Catches events from outer
+            setupContentEditableListeners('innerEditableDiv', 'nestedEditableOutput', 'nestedEditableEventLog'); // Specifically for inner, updates same output
+
+            // Readonly input listener (for focus/click, not input/change)
+            const readonlyInput = document.getElementById('readonlyTextInput');
+            const readonlyOutput = document.getElementById('readonlyTextInputOutput');
+            const readonlyEventLog = document.getElementById('readonlyTextInputEventLog');
+
+            if(readonlyInput && readonlyOutput && readonlyEventLog) {
+                ['focus', 'blur', 'click', 'select', 'copy', 'cut', 'paste'].forEach(eventType => {
+                     readonlyInput.addEventListener(eventType, (event) => {
+                        const logMsg = `Event: ${event.type} on readonly field. Value: ${event.target.value}`;
+                        readonlyEventLog.innerHTML = logMsg + '<br>' + readonlyEventLog.innerHTML.substring(0, 200);
+                        console.log(`Element ID: readonlyTextInput, ${logMsg}`);
+                        if (event.type === 'paste' || event.type === 'cut') { // Note: Cut/Paste shouldn't work on readonly
+                            readonlyOutput.innerHTML = `<span class="error-message">Attempted ${event.type} on readonly field. This should ideally be prevented by the browser.</span>`;
+                            logToGeneral(`Attempted ${event.type} on readonlyTextInput. This should be prevented by browser.`, 'warn');
+                        }
+                    });
+                });
+            } else {
+                logToGeneral('Readonly input, output, or event log element not found.', 'error');
+            }
+
+
+            logToGeneral('Page loaded and event listeners initialized.', 'success');
+        });
+
+        // Global error handler for uncaught exceptions
+        window.onerror = function(message, source, lineno, colno, error) {
+            const generalLogArea = document.getElementById('generalLog');
+            const entry = document.createElement('div');
+            const errorMessage = `[${new Date().toLocaleTimeString()}] Uncaught JS Error: ${message} at ${source}:${lineno}:${colno}`;
+            entry.textContent = errorMessage;
+            entry.classList.add('error-message');
+            if (generalLogArea) {
+                generalLogArea.appendChild(entry);
+                generalLogArea.scrollTop = generalLogArea.scrollHeight;
+            }
+            console.error("Uncaught JS Error:", message, "at", source, `line ${lineno}, col ${colno}`, error);
+            return true; // Prevents the firing of the default event handler
+        };
+    </script>
+</body>
+</html>
