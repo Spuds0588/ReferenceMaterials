@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outlook Calendar Event Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <style>
+        .tag {
+            margin: 0.25em;
+        }
+        .notification {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">Outlook Calendar Event Generator</h1>
+            <div class="field">
+                <label class="label">Attendees</label>
+                <div class="control">
+                    <input class="input" type="text" id="attendees" placeholder="Enter email addresses">
+                </div>
+                <div id="attendees-tags"></div>
+                <p class="help">Press space, enter, comma, or semicolon to add an email.</p>
+            </div>
+            <div class="field">
+                <label class="label">Subject</label>
+                <div class="control">
+                    <input class="input" type="text" id="subject" placeholder="Enter event subject">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Description</label>
+                <div class="control">
+                    <textarea class="textarea" id="description" placeholder="Enter event description"></textarea>
+                </div>
+                <p class="help is-danger" id="description-error" style="display: none;">Line breaks are not supported in Outlook create meeting deeplinks.</p>
+            </div>
+            <div class="field">
+                <label class="label">Start Date/Time</label>
+                <div class="control">
+                    <input class="input" type="datetime-local" id="startdt">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">End Date/Time</label>
+                <div class="control">
+                    <input class="input" type="datetime-local" id="enddt">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Location</label>
+                <div class="control">
+                    <input class="input" type="text" id="location" placeholder="Enter event location">
+                </div>
+            </div>
+            <div class="field">
+                <label class="checkbox">
+                    <input type="checkbox" id="allday"> All Day Event
+                </label>
+            </div>
+            <div class="control">
+                <button class="button is-primary" onclick="generateURL()">Generate URL</button>
+            </div>
+            <div class="field" id="url-field" style="display: none;">
+                <label class="label">Generated URL</label>
+                <div class="control">
+                    <input class="input" type="text" id="generated-url" readonly>
+                </div>
+                <div class="control">
+                    <button class="button is-link" onclick="copyToClipboard()">Copy to Clipboard</button>
+                </div>
+            </div>
+            <div class="notification is-success" id="copy-notification">
+                URL copied to clipboard!
+            </div>
+        </div>
+    </section>
+    <script>
+        document.getElementById('description').addEventListener('input', function(event) {
+            const description = event.target.value;
+            if (description.includes('\n') || description.includes('\r')) {
+                document.getElementById('description-error').style.display = 'block';
+                event.target.value = description.replace(/\n|\r/g, ' ');
+            } else {
+                document.getElementById('description-error').style.display = 'none';
+            }
+        });
+
+        document.getElementById('attendees').addEventListener('keydown', function(event) {
+            if (event.key === ' ' || event.key === 'Enter' || event.key === ',' || event.key === ';') {
+                const input = event.target;
+                const email = input.value.trim();
+                if (validateEmail(email)) {
+                    addTag(email);
+                    input.value = '';
+                }
+                event.preventDefault();
+            }
+        });
+
+        function validateEmail(email) {
+            const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+            return re.test(email);
+        }
+
+        function addTag(email) {
+            const tag = document.createElement('span');
+            tag.className = 'tag is-info';
+            tag.textContent = email;
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'delete';
+            deleteButton.onclick = function() {
+                tag.remove();
+            };
+            tag.appendChild(deleteButton);
+            document.getElementById('attendees-tags').appendChild(tag);
+        }
+
+        function generateURL() {
+            const subject = encodeURIComponent(document.getElementById('subject').value);
+            const description = encodeURIComponent(document.getElementById('description').value.replace(/\n|\r/g, ' '));
+            const startdt = document.getElementById('startdt').value;
+            const enddt = document.getElementById('enddt').value;
+            const location = encodeURIComponent(document.getElementById('location').value);
+            const allday = document.getElementById('allday').checked;
+
+            let url = `https://outlook.office.com/calendar/0/deeplink/compose?subject=${subject}&body=${description}&location=${location}`;
+            if (startdt) {
+                url += `&startdt=${startdt}`;
+            }
+            if (enddt) {
+                url += `&enddt=${enddt}`;
+            }
+            if (allday) {
+                url += `&allday=true`;
+            }
+
+            const attendees = Array.from(document.getElementById('attendees-tags').children).map(tag => tag.textContent.replace('×', '')).join(',');
+            if (attendees) {
+                url += `&to=${encodeURIComponent(attendees)}`;
+            }
+
+            document.getElementById('generated-url').value = url;
+            document.getElementById('url-field').style.display = 'block';
+        }
+
+        function copyToClipboard() {
+            const urlField = document.getElementById('generated-url');
+            urlField.select();
+            document.execCommand('copy');
+            document.getElementById('copy-notification').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('copy-notification').style.display = 'none';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
