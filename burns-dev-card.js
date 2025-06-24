@@ -102,7 +102,7 @@ template.innerHTML = `
       <h1 class="title">Corey Burns</h1>
       <h2 class="subtitle">Product Manager & Innovator</h2>
       <p class="description">
-        As a Product Manager and Innovator, I'm passionate about creating solutions that solve real-world problems. Burns Development is my personal collection of tools, templates, and content designed to streamline common tasks and boost productivity.
+        I'm passionate about creating solutions that solve real-world problems. See my other tools and content at the links below.
       </p>
       <div class="buttons">
         <a href="https://spuds0588.github.io/Burns-Development/">
