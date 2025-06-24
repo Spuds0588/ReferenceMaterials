@@ -96,7 +96,7 @@ template.innerHTML = `
 
   <div class="card">
     <div class="card-image">
-      <img src="https://spuds0588.github.io/Burns-Development/Burns%20Development%20-%20Tools%20&%20Templates%20by%20Corey%20Burns_files/Linkedin%20Headshot.png" alt="Headshot of Corey Burns" class="headshot">
+      <img src="hhttps://spuds0588.github.io/Burns-Development/Assets/Linkedin%20Headshot.png" alt="Headshot of Corey Burns" class="headshot">
     </div>
     <div class="card-content">
       <h1 class="title">Corey Burns</h1>
