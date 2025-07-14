@@ -67,19 +67,9 @@
             font-size: 1.1rem;
             border-radius: 8px;
         }
-        .success-message {
-            display: none;
-            margin-top: 20px;
-            text-align: center;
-        }
-        .copilot-button-container {
+        .llm-button-container {
             display: none;
             margin-top: 24px;
-            text-align: center;
-        }
-        #copilot-button {
-            padding: 16px 28px;
-            font-size: 1.3rem;
         }
         .output-text {
             padding: 20px;
@@ -92,7 +82,28 @@
             font-size: 1.1rem;
             line-height: 1.5;
         }
-        /* Touch-friendly spacing */
+        
+        /* --- STYLES FOR LOGO BUTTONS --- */
+        .llm-button-container .button {
+            height: 52px; /* Consistent height for all buttons */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Style for buttons that ONLY contain a logo image */
+        .button.has-logo-only img {
+            max-height: 30px; /* Generous height for wide logos */
+            width: auto;
+        }
+        /* Style for buttons with an icon AND text */
+        .button .icon:first-child:not(:last-child) {
+            margin-right: 0.5em; /* Space between icon and text */
+        }
+        .button .icon img {
+            max-height: 24px;
+            width: auto;
+        }
+        
         .mt-3 {
             margin-top: 15px;
         }
@@ -103,6 +114,13 @@
             .card-content {
                 padding: 16px;
             }
+            .llm-button-container .buttons {
+                flex-direction: column; /* Stack buttons vertically on mobile */
+            }
+            .llm-button-container .buttons .button {
+                width: 100%;
+                margin-bottom: 10px; /* Add space between stacked buttons */
+            }
         }
     </style>
 </head>
@@ -111,9 +129,6 @@
         <div class="card">
             <div class="card-header">
                 <div class="card-header-title">
-                    <span class="icon mr-2">
-                        <i class="fab fa-linkedin"></i>
-                    </span>
                     LinkedIn Post Optimizer
                 </div>
             </div>
@@ -133,7 +148,7 @@
                     
                     <div class="result-container" id="result-container">
                         <div class="notification is-primary" id="copy-success" style="display: none;">
-                            <strong>Copied to clipboard. Continue to Copilot?</strong>
+                            <strong>Copied to clipboard. Now, choose an AI to refine your post:</strong>
                         </div>
                         <div class="notification is-danger" id="copy-error" style="display: none;">
                             <strong>Couldn't copy automatically. Please use the button below:</strong>
@@ -142,8 +157,27 @@
                         <div id="output-text" class="output-text"></div>
                     </div>
                     
-                    <div class="copilot-button-container" id="copilot-button-container">
-                        <button class="button is-info is-large" id="copilot-button">Go to Copilot</button>
+                    <div class="llm-button-container" id="llm-button-container">
+                        <div class="buttons is-centered">
+                             <button class="button is-light is-medium has-logo-only" id="gemini-button">
+                                <img src="https://spuds0588.github.io/ReferenceMaterials/Assets/Google_Gemini_logo.svg" alt="Google Gemini Logo">
+                            </button>
+                            <button class="button is-light is-medium has-logo-only" id="claude-button">
+                                <img src="https://spuds0588.github.io/ReferenceMaterials/Assets/Claude_AI_logo.svg" alt="Anthropic Claude Logo">
+                            </button>
+                            <button class="button is-success is-medium" id="chatgpt-button">
+                                <span class="icon">
+                                    <img src="https://spuds0588.github.io/ReferenceMaterials/Assets/ChatGPT-Logo.svg" alt="OpenAI ChatGPT Logo">
+                                </span>
+                                <span>ChatGPT</span>
+                            </button>
+                             <button class="button is-info is-medium" id="copilot-button">
+                                <span class="icon">
+                                    <img src="https://spuds0588.github.io/ReferenceMaterials/Assets/copilot-icon.svg" alt="Microsoft Copilot Logo">
+                                </span>
+                                <span>Copilot</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -159,11 +193,15 @@
             const copySuccess = document.getElementById('copy-success');
             const copyError = document.getElementById('copy-error');
             const manualCopyButton = document.getElementById('manual-copy-button');
-            const copilotButtonContainer = document.getElementById('copilot-button-container');
-            const copilotButton = document.getElementById('copilot-button');
+            const llmButtonContainer = document.getElementById('llm-button-container');
             const outputText = document.getElementById('output-text');
+
+            // AI Buttons
+            const copilotButton = document.getElementById('copilot-button');
+            const geminiButton = document.getElementById('gemini-button');
+            const claudeButton = document.getElementById('claude-button');
+            const chatgptButton = document.getElementById('chatgpt-button');
             
-            // Template for the prompt
             function generatePrompt(draftText) {
                 return `Take on the role of an experienced social media manager for LinkedIn. Revamp the post provided below to make it more engaging and impactful. Your response should *only* contain the complete final post, ready to copy and paste into LinkedIn. Avoid providing any explanations, headers, or formatting outside the post.
 
@@ -199,74 +237,41 @@ Provide the revamped post below, based on the following input:
 """${draftText}"""`;
             }
             
-            nextButton.addEventListener('click', function() {
-                const draftText = draftTextarea.value.trim();
-                if (!draftText) {
-                    alert("Please enter your LinkedIn draft post first.");
-                    return;
-                }
-                
-                // Generate the prompt with the draft text
-                const prompt = generatePrompt(draftText);
-                
-                // Try to copy to clipboard
-                copyToClipboard(prompt);
-            });
-            
             function copyToClipboard(text) {
-                // Show the result container first
                 resultContainer.style.display = 'block';
-                
-                // Save the text for possible manual copying
                 outputText.textContent = text;
                 
-                // Try the modern clipboard API
                 if (navigator.clipboard && window.isSecureContext) {
                     navigator.clipboard.writeText(text)
                         .then(() => {
-                            // Success
                             copySuccess.style.display = 'block';
                             copyError.style.display = 'none';
-                            copilotButtonContainer.style.display = 'block';
+                            llmButtonContainer.style.display = 'block';
                         })
-                        .catch((err) => {
-                            // Failed, show manual copy option
+                        .catch(() => {
                             copySuccess.style.display = 'none';
                             copyError.style.display = 'block';
                             outputText.style.display = 'block';
                         });
                 } else {
-                    // Fallback for older browsers or non-secure contexts
                     try {
-                        // Create a temporary textarea element
                         const textArea = document.createElement('textarea');
                         textArea.value = text;
-                        
-                        // Make the textarea out of viewport
                         textArea.style.position = 'fixed';
                         textArea.style.left = '-999999px';
                         textArea.style.top = '-999999px';
                         document.body.appendChild(textArea);
-                        
-                        // Select and copy
                         textArea.focus();
                         textArea.select();
-                        const successful = document.execCommand('copy');
-                        document.body.removeChild(textArea);
-                        
-                        if (successful) {
-                            // Success
+                        if (document.execCommand('copy')) {
                             copySuccess.style.display = 'block';
                             copyError.style.display = 'none';
-                            copilotButtonContainer.style.display = 'block';
+                            llmButtonContainer.style.display = 'block';
                         } else {
-                            // Failed, show manual copy option
-                            copySuccess.style.display = 'none';
-                            copyError.style.display = 'block';
-                            outputText.style.display = 'block';
+                            throw new Error('Copy failed');
                         }
+                        document.body.removeChild(textArea);
                     } catch (err) {
-                        // Failed, show manual copy option
                         copySuccess.style.display = 'none';
                         copyError.style.display = 'block';
                         outputText.style.display = 'block';
@@ -274,73 +279,24 @@ Provide the revamped post below, based on the following input:
                 }
             }
             
-            // Manual copy button functionality
-            manualCopyButton.addEventListener('click', function() {
-                // Try to copy again
-                const text = outputText.textContent;
-                
-                if (navigator.clipboard && window.isSecureContext) {
-                    navigator.clipboard.writeText(text)
-                        .then(() => {
-                            // Success
-                            copySuccess.style.display = 'block';
-                            copyError.style.display = 'none';
-                            copilotButtonContainer.style.display = 'block';
-                        })
-                        .catch((err) => {
-                            // Still failed, keep showing the text for manual selection
-                            alert("Please select all the text and copy it manually.");
-                        });
-                } else {
-                    try {
-                        // Create a temporary textarea element
-                        const textArea = document.createElement('textarea');
-                        textArea.value = text;
-                        
-                        // Make the textarea out of viewport
-                        textArea.style.position = 'fixed';
-                        textArea.style.left = '-999999px';
-                        textArea.style.top = '-999999px';
-                        document.body.appendChild(textArea);
-                        
-                        // Select and copy
-                        textArea.focus();
-                        textArea.select();
-                        const successful = document.execCommand('copy');
-                        document.body.removeChild(textArea);
-                        
-                        if (successful) {
-                            // Success
-                            copySuccess.style.display = 'block';
-                            copyError.style.display = 'none';
-                            copilotButtonContainer.style.display = 'block';
-                        } else {
-                            // Still failed, keep showing the text for manual selection
-                            alert("Please select all the text and copy it manually.");
-                        }
-                    } catch (err) {
-                        // Still failed, keep showing the text for manual selection
-                        alert("Please select all the text and copy it manually.");
-                    }
+            nextButton.addEventListener('click', function() {
+                const draftText = draftTextarea.value.trim();
+                if (!draftText) {
+                    alert("Please enter your LinkedIn draft post first.");
+                    return;
                 }
+                const prompt = generatePrompt(draftText);
+                copyToClipboard(prompt);
+            });
+
+            manualCopyButton.addEventListener('click', function() {
+                copyToClipboard(outputText.textContent);
             });
             
-            // Go to Copilot button
-            copilotButton.addEventListener('click', function() {
-                // Check if we're on an Android device
-                const isAndroid = /Android/i.test(navigator.userAgent);
-                
-                if (isAndroid) {
-                    // Try to use an intent URL for Android
-                    window.location.href = "https://copilot.microsoft.com/";
-                    
-                    // Alternative: Try to use a deep link if Microsoft has one
-                    // window.location.href = "copilot://";
-                } else {
-                    // For other devices, just open the web URL
-                    window.open("https://copilot.microsoft.com/", "_blank");
-                }
-            });
+            copilotButton.addEventListener('click', () => window.open("https://copilot.microsoft.com/", "_blank"));
+            geminiButton.addEventListener('click', () => window.open("https://gemini.google.com/", "_blank"));
+            claudeButton.addEventListener('click', () => window.open("https://claude.ai/", "_blank"));
+            chatgptButton.addEventListener('click', () => window.open("https://chat.openai.com/", "_blank"));
         });
     </script>
  
