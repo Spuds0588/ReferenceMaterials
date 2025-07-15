@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arive Task Bookmarklet Generator v4.1</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/css/suneditor.min.css" rel="stylesheet">
+    
+    <style>
+        /* --- BRAND COLORS --- */
+        :root {
+            --brand-primary: #2C3E50;    /* Deep Slate Blue */
+            --brand-secondary: #3498DB;  /* Bright Blue */
+            --brand-success: #2ECC71;    /* Green */
+            --brand-background: #ECF0F1;/* Light Grey */
+        }
+
+        /* --- GENERAL STYLES --- */
+        html {
+            background-color: var(--brand-background);
+            scroll-behavior: smooth;
+        }
+        .wizard-step {
+            display: none;
+        }
+        .wizard-step.is-active {
+            display: block;
+        }
+        .task-card {
+            position: relative;
+            background-color: white;
+            border: 1px solid #dbdbdb;
+        }
+        .delete-task-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .placeholder-gif {
+            border: 2px dashed #ccc;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 280px;
+            color: #7a7a7a;
+            font-size: 1.2rem;
+            text-align: center;
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        /* --- BRANDED ELEMENT STYLES --- */
+        .hero.is-primary {
+            background-color: var(--brand-primary);
+        }
+        .button.is-primary {
+            background-color: var(--brand-primary);
+            font-weight: bold;
+        }
+        .button.is-primary:hover {
+            background-color: #202d3a;
+        }
+        .button.is-secondary {
+            background-color: var(--brand-secondary);
+            color: white;
+            font-weight: bold;
+        }
+         .button.is-secondary:hover {
+            background-color: #2a87c5;
+        }
+        .bookmarklet-link {
+            background-color: var(--brand-success);
+            border: 2px dashed #25a25a;
+            color: white;
+            font-weight: bold;
+            cursor: move;
+        }
+        .bookmarklet-link:hover {
+            background-color: #28b865;
+            color: white;
+        }
+        .saved-item-link {
+            background-color: var(--brand-secondary);
+            border: 2px dashed #2a87c5;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <section class="hero is-primary">
+        <div class="hero-body">
+            <div class="container">
+                <div class="level">
+                    <div class="level-left">
+                        <div>
+                            <p class="title">Arive Task Bookmarklet Generator</p>
+                            <p class="subtitle">Create Your Perfect Workflow</p>
+                        </div>
+                    </div>
+                    <div class="level-right">
+                        <button id="view-saved-btn" class="button is-white is-outlined">
+                            <span class="icon"><i class="fas fa-save"></i></span>
+                            <span>View Saved</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="section">
+        <div class="container">
+            <!-- WIZARD STEP 1: DEFINE TASKS -->
+            <div id="step-1-define" class="wizard-step is-active">
+                <div class="box">
+                    <h2 class="title is-4">Step 1: Build Your Task List</h2>
+                    <p class="mb-4">Add, remove, and configure the tasks you want the bookmarklet to create. Click "Next Step" when you're done.</p>
+                    <div id="task-list"></div>
+                    <button id="add-task-btn" class="button is-link is-light mt-4">
+                        <span class="icon is-small"><i class="fas fa-plus"></i></span>
+                        <span>Add Another Task</span>
+                    </button>
+                </div>
+                <div class="has-text-right">
+                    <button data-nav="next" class="button is-primary is-medium">Next Step &rarr;</button>
+                </div>
+            </div>
+
+            <!-- WIZARD STEP 2: NAME BOOKMARKLET -->
+            <div id="step-2-name" class="wizard-step">
+                <div class="box">
+                    <h2 class="title is-4">Step 2: Name Your Bookmarklet</h2>
+                    <p class="mb-4">Give your bookmarklet a memorable name. Emojis are welcome! 🚀</p>
+                    <div class="field">
+                        <label class="label">Bookmarklet Name</label>
+                        <div class="control">
+                            <input id="bookmarklet-name-input" class="input is-medium" type="text" placeholder="e.g., New Loan Checklist ✅">
+                        </div>
+                    </div>
+                </div>
+                <div class="buttons is-justify-content-space-between">
+                    <button data-nav="back" class="button is-medium">&larr; Back</button>
+                    <button id="generate-btn" class="button is-primary is-medium">Generate & Save</button>
+                </div>
+            </div>
+
+            <!-- WIZARD STEP 3: SAVE & DRAG -->
+            <div id="step-3-save" class="wizard-step">
+                <div class="box">
+                    <h2 class="title is-4">Step 3: Save to Your Browser</h2>
+                     <div class="columns is-vcentered">
+                        <div class="column">
+                           <p>Your bookmarklet has been generated and saved! Now, <strong>click and drag the green button below</strong> to your browser's bookmarks bar.</p>
+                            <div class="my-5 has-text-centered">
+                                <a href="#" id="bookmarklet-link" class="button is-large bookmarklet-link">My Arive Tasks</a>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="placeholder-gif">
+                                <p>Placeholder for a GIF showing how to drag the button to the bookmarks bar.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="field">
+                        <label class="label">For advanced users, here is the raw code:</label>
+                        <textarea id="raw-code-output" class="textarea is-small" readonly></textarea>
+                    </div>
+                </div>
+                <div class="buttons is-justify-content-space-between">
+                     <button data-nav="back" class="button is-medium">&larr; Back</button>
+                     <button data-nav="next" class="button is-primary is-medium">Usage Instructions &rarr;</button>
+                </div>
+            </div>
+
+            <!-- WIZARD STEP 4: USAGE -->
+            <div id="step-4-usage" class="wizard-step">
+                <div class="box">
+                    <h2 class="title is-4">Step 4: How to Use</h2>
+                     <div class="columns is-vcentered">
+                        <div class="column">
+                            <p>You're all set! To use your new tool:</p>
+                            <ol style="margin: 1.5rem 0 1.5rem 2rem;">
+                                <li>Navigate to any loan file in Arive.</li>
+                                <li>Click your newly saved bookmarklet in your bookmarks bar.</li>
+                                <li>A confirmation modal will appear. Review the tasks and click "Confirm & Run".</li>
+                                <li>Watch as the tasks are created automatically!</li>
+                            </ol>
+                        </div>
+                        <div class="column">
+                            <div class="placeholder-gif">
+                                <p>Placeholder for a GIF showing a user clicking the bookmarklet on an Arive page.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="buttons is-justify-content-space-between">
+                     <button data-nav="back" class="button is-medium">&larr; Back</button>
+                     <button id="start-over-btn" class="button is-secondary is-medium">Create Another Bookmarklet</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Saved Bookmarklets Modal -->
+    <div id="saved-modal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Saved Bookmarklets</p>
+                <button class="delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body" id="saved-list-container">
+                <!-- Saved items will be injected here -->
+            </section>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script defer src="https://use.fontawesome.com/releases/v5.14.0/js/all.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/suneditor@latest/dist/suneditor.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let tasks = [];
+            let nextTaskId = 0;
+            let currentStep = 1;
+
+            const wizardSteps = document.querySelectorAll('.wizard-step');
+            const navButtons = document.querySelectorAll('[data-nav]');
+            const addTaskBtn = document.getElementById('add-task-btn');
+            const taskListContainer = document.getElementById('task-list');
+            const generateBtn = document.getElementById('generate-btn');
+            const startOverBtn = document.getElementById('start-over-btn');
+            const bookmarkletNameInput = document.getElementById('bookmarklet-name-input');
+            const bookmarkletLink = document.getElementById('bookmarklet-link');
+            const rawCodeOutput = document.getElementById('raw-code-output');
+            const savedModal = document.getElementById('saved-modal');
+            const viewSavedBtn = document.getElementById('view-saved-btn');
+            const savedListContainer = document.getElementById('saved-list-container');
+            
+            const showStep = (stepNumber) => {
+                window.scrollTo(0, 0);
+                currentStep = stepNumber;
+                wizardSteps.forEach(step => step.classList.remove('is-active'));
+                document.getElementById(`step-${stepNumber}-define`)?.classList.add('is-active');
+                document.getElementById(`step-${stepNumber}-name`)?.classList.add('is-active');
+                document.getElementById(`step-${stepNumber}-save`)?.classList.add('is-active');
+                document.getElementById(`step-${stepNumber}-usage`)?.classList.add('is-active');
+            };
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const direction = button.dataset.nav;
+                    if (direction === 'next') showStep(currentStep + 1);
+                    if (direction === 'back') showStep(currentStep - 1);
+                });
+            });
+
+            startOverBtn.addEventListener('click', () => {
+                tasks = [];
+                nextTaskId = 0;
+                addNewTask();
+                showStep(1);
+            });
+            
+            const getSavedBookmarklets = () => JSON.parse(localStorage.getItem('ariveTaskBookmarklets_v4') || '[]');
+            const saveBookmarklet = (newBookmarklet) => {
+                let saved = getSavedBookmarklets();
+                saved.unshift(newBookmarklet);
+                localStorage.setItem('ariveTaskBookmarklets_v4', JSON.stringify(saved));
+            };
+            const deleteBookmarklet = (id) => {
+                let saved = getSavedBookmarklets();
+                saved = saved.filter(bm => bm.id !== id);
+                localStorage.setItem('ariveTaskBookmarklets_v4', JSON.stringify(saved));
+                renderSavedList();
+            };
+
+            const renderSavedList = () => {
+                const saved = getSavedBookmarklets();
+                savedListContainer.innerHTML = '';
+                if (saved.length === 0) {
+                    savedListContainer.innerHTML = '<p>No bookmarklets saved yet. Generate one to see it here!</p>';
+                    return;
+                }
+                const list = document.createElement('div');
+                saved.forEach(bm => {
+                    const item = document.createElement('div');
+                    item.className = 'box is-flex is-align-items-center is-justify-content-space-between';
+                    const creationDate = new Date(bm.createdAt).toLocaleString();
+                    item.innerHTML = `<div><a href="${bm.href}" class="button is-small saved-item-link bookmarklet-link" title="Drag me!">${bm.name}</a><p class="is-size-7 has-text-grey mt-1">Created: ${creationDate}</p></div><button class="delete" data-id="${bm.id}"></button>`;
+                    item.querySelector('.delete').addEventListener('click', (e) => {
+                        if(confirm(`Are you sure you want to delete "${bm.name}"?`)) {
+                            deleteBookmarklet(bm.id);
+                        }
+                    });
+                    list.appendChild(item);
+                });
+                savedListContainer.appendChild(list);
+            };
+
+            viewSavedBtn.addEventListener('click', () => {
+                renderSavedList();
+                savedModal.classList.add('is-active');
+            });
+            savedModal.querySelector('.modal-background').addEventListener('click', () => savedModal.classList.remove('is-active'));
+            savedModal.querySelector('.delete').addEventListener('click', () => savedModal.classList.remove('is-active'));
+
+            const renderTasks = () => {
+                tasks.forEach(task => { if (task.editorInstance) { task.editorInstance.destroy(); task.editorInstance = null; } });
+                taskListContainer.innerHTML = '';
+                if (tasks.length === 0) {
+                    taskListContainer.innerHTML = '<p class="has-text-grey">No tasks defined yet. Click "Add Another Task" to begin.</p>';
+                } else {
+                    tasks.forEach((task, index) => {
+                        const taskCard = document.createElement('div');
+                        taskCard.className = 'task-card box';
+                        taskCard.dataset.taskId = task.id;
+                        taskCard.innerHTML = `<button class="delete delete-task-btn" aria-label="close"></button><h3 class="subtitle is-6">Task ${index + 1}</h3><div class="field"><label class="label">Task Title <span class="has-text-danger">*</span></label><div class="control"><input class="input" type="text" placeholder="e.g., Order Appraisal" data-field="title" value="${task.title}"></div></div><div class="field"><label class="label">Description (Rich Text)</label><div class="control"><textarea id="editor-${task.id}" data-field="description" style="display:none;">${task.description}</textarea></div></div><div class="field is-horizontal"><div class="field-label is-normal"><label class="label">Due Date</label></div><div class="field-body"><div class="field has-addons"><div class="control"><input class="input" type="number" min="1" data-field="dueDateValue" value="${task.dueDateValue}"></div><div class="control"><span class="select"><select data-field="dueDateUnit"><option value="hours" ${task.dueDateUnit === 'hours' ? 'selected' : ''}>Hour(s) from now</option><option value="days" ${task.dueDateUnit === 'days' ? 'selected' : ''}>Day(s) from now</option><option value="weeks" ${task.dueDateUnit === 'weeks' ? 'selected' : ''}>Week(s) from now</option></select></span></div></div></div></div><div class="field"><label class="label">Task Association</label><div class="control"><div class="select is-fullwidth"><select data-field="type"><option value="loan" ${task.type === 'loan' ? 'selected' : ''}>Loan-Specific</option><option value="general" ${task.type === 'general' ? 'selected' : ''}>General (not tied to any loan)</option></select></div></div></div>`;
+                        taskListContainer.appendChild(taskCard);
+                        const editor = SUNEDITOR.create(`editor-${task.id}`, { buttonList: [['undo', 'redo'], ['bold', 'italic', 'underline', 'strike'], ['list'], ['link']], width: '100%', height: 'auto', minHeight: '100px', defaultStyle: 'font-family: Arial; font-size: 14px;' });
+                        task.editorInstance = editor;
+                        editor.onChange = (contents) => { task.description = contents; };
+                    });
+                }
+                attachEventListeners();
+            };
+            const attachEventListeners = () => {
+                document.querySelectorAll('.task-card').forEach(card => {
+                    card.querySelectorAll('input, select').forEach(input => {
+                        input.addEventListener('input', (e) => { const task = tasks.find(t => t.id === parseInt(card.dataset.taskId, 10)); if (task) task[e.target.dataset.field] = e.target.value; });
+                    });
+                    card.querySelector('.delete-task-btn').addEventListener('click', (e) => {
+                        if (tasks.length > 1) { const taskId = parseInt(card.dataset.taskId, 10); const taskToDelete = tasks.find(t => t.id === taskId); if (taskToDelete && taskToDelete.editorInstance) taskToDelete.editorInstance.destroy(); tasks = tasks.filter(t => t.id !== taskId); renderTasks(); } else { alert("You must have at least one task."); }
+                    });
+                });
+            };
+            const addNewTask = () => {
+                tasks.push({ id: nextTaskId++, title: '', description: '', dueDateValue: 3, dueDateUnit: 'days', type: 'loan', editorInstance: null });
+                renderTasks();
+            };
+            addTaskBtn.addEventListener('click', addNewTask);
+
+            generateBtn.addEventListener('click', () => {
+                tasks.forEach(task => { if (task.editorInstance) { let content = task.editorInstance.getContents(true); task.description = (content === '<p><br></p>') ? '' : content; } });
+                if (tasks.length === 0 || tasks.some(t => !t.title.trim())) {
+                    alert('Please add at least one task with a title.'); return;
+                }
+                const bookmarkletName = bookmarkletNameInput.value.trim() || 'My Arive Tasks';
+                const taskDefinitionsString = `[${tasks.map(task =>`{title:${JSON.stringify(task.title)},description:${JSON.stringify(task.description)},dueDateValue:${task.dueDateValue},dueDateUnit:'${task.dueDateUnit}',isLoanTask:${task.type==='loan'}}`).join(',')}]`;
+                const bookmarkletLogic=`(async()=>{const e="arive-task-creator-modal-v4",t="arive-task-creator-style-v4";if(document.getElementById(e))return;let o=!1;const n=(e,t)=>{const o=new Date;return"hours"===t&&o.setHours(o.getHours()+parseInt(e,10)),"days"===t&&o.setDate(o.getDate()+parseInt(e,10)),"weeks"===t&&o.setDate(o.getDate()+7*parseInt(e,10)),o},s=${taskDefinitionsString},a=async()=>{const e=window.location.pathname.match(/\\/loans\\/(\\d+)/),t=Object.keys(localStorage).find((e=>e.startsWith("@@auth0spajs@@")));if(!t)throw new Error("Auth0 token key not found.");const o=JSON.parse(localStorage.getItem(t)),n=o?.body?.access_token;if(!n)throw new Error("Access token not found.");const s=localStorage.getItem("activeOrgUnit"),i=localStorage.getItem("activeUserId");if(!s||!i)throw new Error("Could not find 'activeOrgUnit' or 'activeUserId'.");return{loanId:e?e[1]:null,orgUnitId:Number(s),userId:Number(i),authHeaders:{authorization:\`Bearer \${n}\`,"lw-org-unit-id":s,usertimezone:Intl.DateTimeFormat().resolvedOptions().timeZone,accept:"application/json, text/plain, */*"}}},i=async(e,t)=>{const o=e.isLoanTask?t.loanId:null;if(e.isLoanTask&&!t.loanId)throw new Error("Task is loan-specific, but no loan ID was found in URL.");const s=\`https://workflowtasksapi.myarive.com/workflow-task/api/\${o?o+"/tasks?showLoader=false":"tasks?showLoader=false"}\`,a=n(e.dueDateValue,e.dueDateUnit),i=-(new Date).getTimezoneOffset(),d=i>=0?"+":"-",r=e=>String(e).padStart(2,"0"),l=\`\${a.getFullYear()}-\${r(a.getMonth()+1)}-\${r(a.getDate())}T\${r(a.getHours())}:\${r(a.getMinutes())}:\${r(a.getSeconds())}\${d}\${r(Math.floor(Math.abs(i)/60))}:\${r(Math.abs(i)%60)}\`,c={title:e.title,description:e.description||null,dueDate:l,loanId:o?Number(o):null,AssigneeId:t.userId,AssigneeOrgId:t.orgUnitId,status:"TODO",notes:{}};const u=await fetch(s,{method:"POST",headers:{...t.authHeaders,"content-type":"application/json"},body:JSON.stringify(c)});if(!u.ok){const e=await u.json().catch((()=>({})));throw new Error(\`\${u.status}: \${e.message||u.statusText}\`)}},d=()=>{document.getElementById(e)?.remove(),document.getElementById(t)?.remove()},r=async()=>{let t;try{t=await a()}catch(e){return alert(\`Initialization Failed: \${e.message}\`),void d()}document.querySelectorAll(\`#\${e} .button\`).forEach((e=>{e.disabled=!0})),document.getElementById("arive-task-creator-cancel-btn").disabled=!1,document.getElementById("arive-task-creator-confirm-btn").classList.add("is-loading");let n=0,r=0;for(let a=0;a<s.length;a++){if(o)document.getElementById(\`task-status-\${a}\`).innerHTML="<span>Skipped</span>";else{const u=s[a],m=document.getElementById(\`task-status-\${a}\`);m.innerHTML="<span>Working...</span>";try{await i(u,t),m.innerHTML="<span>✅ Success</span>",n++}catch(e){m.innerHTML=\`<span title="\${e.message}">❌ Failed</span>\`,r++}}}const l=document.querySelector(\`#\${e} .modal-card-title\`);l.textContent=o?"Process Cancelled":"Process Complete",document.querySelector(\`#\${e} .modal-card-body\`).insertAdjacentHTML("beforeend",\`<div class="summary"><p><strong>Summary:</strong> \${n} succeeded, \${r} failed.</p></div>\`),document.getElementById("arive-task-creator-confirm-btn").style.display="none",document.getElementById("arive-task-creator-cancel-btn").style.display="none";const c=document.getElementById("arive-task-creator-close-btn");c.style.display="inline-flex",c.disabled=!1},l=\`#\${e}{position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;display:flex;align-items:center;justify-content:center;background-color:rgba(10,10,10,.8);box-sizing:border-box;font-family:sans-serif}#\${e} *,#\${e} *::before,#\${e} *::after{box-sizing:inherit}#\${e} .modal-card{width:90%;max-width:640px;background-color:#fff;border-radius:6px;display:flex;flex-direction:column;max-height:calc(100vh - 40px)}#\${e} .modal-card-head,#\${e} .modal-card-foot{align-items:center;background-color:#f5f5f5;display:flex;flex-shrink:0;justify-content:flex-start;padding:20px;position:relative}#\${e} .modal-card-head{border-bottom:1px solid #dbdbdb;border-top-left-radius:6px;border-top-right-radius:6px}#\${e} .modal-card-foot{border-bottom-left-radius:6px;border-bottom-right-radius:6px;border-top:1px solid #dbdbdb;justify-content:flex-end}#\${e} .modal-card-body{-webkit-overflow-scrolling:touch;background-color:#fff;flex-grow:1;flex-shrink:1;overflow:auto;padding:20px;color:#4a4a4a}#\${e} .modal-card-title{color:#363636;flex-grow:1;flex-shrink:0;font-size:1.5rem;line-height:1;margin:0}#\${e} .table-container{overflow-x:auto}#\${e} .table{background-color:#fff;color:#363636;width:100%;border-collapse:collapse}#\${e} .table td,#\${e} .table th{border:1px solid #dbdbdb;padding:.5em .75em;vertical-align:middle;text-align:left}#\${e} .table th{color:#363636;font-weight:700}#\${e} .button{-moz-appearance:none;-webkit-appearance:none;align-items:center;border:1px solid transparent;border-radius:4px;box-shadow:none;display:inline-flex;font-size:1rem;height:2.5em;justify-content:center;line-height:1.5;padding:.5em 1em;position:relative;vertical-align:top;cursor:pointer;text-decoration:none}#\${e} .button:not(:last-child){margin-right:.5rem}#\${e} .button.is-success{background-color:#2ECC71;color:#fff}#\${e} .button.is-link{background-color:#3498DB;color:#fff}#\${e} .button[disabled]{cursor:not-allowed}#\${e} .button.is-loading::after{animation:spinAround 1s linear infinite;border:2px solid #dbdbdb;border-radius:290486px;border-right-color:transparent;border-top-color:transparent;content:'';display:block;height:1em;width:1em;position:absolute;left:calc(50% - .5em);top:calc(50% - .5em)}#\${e} .summary{margin-top:1.5rem;background-color:#eff5fb;border-radius:4px;color:#296fa8;padding:1.25rem 1.5rem}@keyframes spinAround{from{transform:rotate(0)}to{transform:rotate(359deg)}}\`,c=document.createElement("style");c.id=t,c.textContent=l,document.head.appendChild(c);const u=s.map(((e,t)=>\`<tr><td>\${e.title}</td><td>\${e.isLoanTask?"Loan":"General"}</td><td>\${n(e.dueDateValue,e.dueDateUnit).toLocaleString()}</td><td id="task-status-\${t}"><span>Pending</span></td></tr>\`)).join(""),m=\`<div id="\${e}"><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Confirm Task Creation</p></header><section class="modal-card-body"><p>The following <strong>\${s.length}</strong> tasks will be created. Please confirm.</p><div class="table-container"><table class="table"><thead><tr><th>Title</th><th>Type</th><th>Est. Due Date</th><th>Status</th></tr></thead><tbody>\${u}</tbody></table></div></section><footer class="modal-card-foot"><button id="arive-task-creator-confirm-btn" class="button is-success">Confirm & Run</button><button id="arive-task-creator-cancel-btn" class="button">Cancel</button><button id="arive-task-creator-close-btn" class="button is-link" style="display:none">Close</button></footer></div></div>\`;document.body.insertAdjacentHTML("beforeend",m),document.getElementById("arive-task-creator-confirm-btn").onclick=r;const g=document.getElementById("arive-task-creator-cancel-btn");g.onclick=()=>{document.getElementById("arive-task-creator-confirm-btn").classList.contains("is-loading")?(o=!0,g.textContent="Cancelling...",g.disabled=!0):d()},document.getElementById("arive-task-creator-close-btn").onclick=d})();`;
+                const fullHref = `javascript:${encodeURIComponent(bookmarkletLogic)}`;
+                bookmarkletLink.textContent = bookmarkletName;
+                bookmarkletLink.href = fullHref;
+                rawCodeOutput.value = `javascript:${bookmarkletLogic}`;
+                saveBookmarklet({ id: Date.now(), name: bookmarkletName, href: fullHref, createdAt: new Date().toISOString() });
+                showStep(3);
+            });
+
+            addNewTask();
+            showStep(1);
+        });
+    </script>
+</body>
+</html>
