@@ -203,13 +203,13 @@
             const chatgptButton = document.getElementById('chatgpt-button');
             
             function generatePrompt(draftText) {
-                return `Take on the role of an experienced social media manager for LinkedIn. Revamp the post provided below to make it more engaging and impactful. Your response should *only* contain the complete final post, ready to copy and paste into LinkedIn. Avoid providing any explanations, headers, or formatting outside the post.
+                return `Take on the role of an experienced social media manager for LinkedIn and Editor who is helping me make my first draft of a LinkedIn post better, explaining why , in an effort to teach and improve my skill. 
 
 ### Instructions:
-1. Write a compelling title that grabs attention and appears "above the fold."
+1. Help me have a compelling title that grabs attention and appears "above the fold."
 2. Add relevant hashtags to maximize reach, placing them at the end of the post.
-3. Use emojis appropriately, but do **not** use the rocket 🚀 emoji.
-4. Format the text using plain text, emojis , and the supported unicode characters listed below, as LinkedIn only supports plain text, emojis, and unicode characters (no markdown).
+3. recommend emojis appropriately, but do **not** use the rocket 🚀 emoji.
+4. Help me format the text using plain text, emojis , and the supported unicode characters listed below, as LinkedIn only supports plain text, emojis, and unicode characters (no markdown).
 
 ### Supported Unicode Formatting Options:
 #### **Text Styling Characters**
@@ -232,7 +232,7 @@
 
 Use these formatting tools as needed to enhance readability, structure, and appeal.
 
-Provide the revamped post below, based on the following input:
+Below is the initial draft you will be acting as editor on, and providing feedback on:
 
 """${draftText}"""`;
             }
