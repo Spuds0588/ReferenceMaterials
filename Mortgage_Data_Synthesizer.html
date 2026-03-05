@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mortgage Data Synthesizer</title>
+    <!-- Bulma CSS for styling -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <!-- SheetJS for Excel/CSV parsing -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <!-- FakerJS for synthetic data generation -->
+    <script type="module">
+        import { faker } from 'https://esm.sh/@faker-js/faker@8.4.1';
+        window.faker = faker; // Make globally available for our script
+    </script>
+    <style>
+        .wizard-step { display: none; }
+        .wizard-step.is-active { display: block; }
+        .mapping-table { max-height: 400px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">Mortgage Data Synthesizer</h1>
+            <p class="subtitle">Secure, client-side PII/NPI anonymization for mortgage datasets.</p>
+
+            <!-- Step 1: File Upload -->
+            <div id="step-1" class="box wizard-step is-active">
+                <h2 class="title is-4">Step 1: Upload Dataset</h2>
+                <div class="file has-name is-boxed is-centered">
+                    <label class="file-label">
+                        <input class="file-input" type="file" id="fileInput" accept=".csv, .xlsx, .json, .xml, .txt">
+                        <span class="file-cta">
+                            <span class="file-label"> Choose a file... </span>
+                        </span>
+                        <span class="file-name" id="fileNameDisplay"> No file uploaded </span>
+                    </label>
+                </div>
+                <div class="notification is-warning mt-4 is-light">
+                    <strong>Note:</strong> Currently supporting CSV, XLSX, and JSON. FNM 3.2 and MISMO 3.4 will require custom parsers (in development). Max file size: 50MB.
+                </div>
+            </div>
+
+            <!-- Step 2: Data Mapping -->
+            <div id="step-2" class="box wizard-step">
+                <h2 class="title is-4">Step 2: Map PII/NPI Columns</h2>
+                <p class="mb-4">Review the detected columns and assign the appropriate FakerJS generator. Unassigned columns will remain unchanged.</p>
+                <div class="table-container mapping-table">
+                    <table class="table is-fullwidth is-striped is-hoverable">
+                        <thead>
+                            <tr>
+                                <th>Column Name</th>
+                                <th>Sample Data</th>
+                                <th>Action / Synthetic Generator</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mappingTableBody">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="buttons is-right mt-4">
+                    <button class="button is-light" onclick="goToStep(1)">Back</button>
+                    <button class="button is-primary" id="btnSynthesize">Synthesize Data</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Export -->
+            <div id="step-3" class="box wizard-step">
+                <h2 class="title is-4">Step 3: Export Synthetic Data</h2>
+                <p class="mb-4">Your data has been securely synthesized in your browser. Select an export format below.</p>
+                
+                <div class="field">
+                    <label class="label">Export Format</label>
+                    <div class="control">
+                        <div class="select">
+                            <select id="exportFormat">
+                                <option value="csv">CSV</option>
+                                <option value="xlsx">Excel (.xlsx)</option>
+                                <option value="json">JSON</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="buttons is-right mt-4">
+                    <button class="button is-light" onclick="goToStep(2)">Back</button>
+                    <button class="button is-success" id="btnExport">Download File</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        // --- GLOBAL STATE ---
+        const AppState = {
+            rawFileName: '',
+            rawWorkbook: null,
+            rawSheetName: '',
+            rawData: [], // JSON representation of the uploaded file
+            syntheticData:[], // Final output data
+            columnHeaders:[],
+            mapping: {} // { "SSN_Column": "faker.person.ssn", ... }
+        };
+
+        // --- DOM ELEMENTS ---
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const mappingTableBody = document.getElementById('mappingTableBody');
+        const btnSynthesize = document.getElementById('btnSynthesize');
+        const btnExport = document.getElementById('btnExport');
+
+        // --- EVENT LISTENERS ---
+        fileInput.addEventListener('change', handleFileUpload);
+        btnSynthesize.addEventListener('click', synthesizeData);
+        btnExport.addEventListener('click', exportData);
+
+        // --- WIZARD NAVIGATION ---
+        function goToStep(stepNumber) {
+            console.log(`[Wizard Flow] Navigating to Step ${stepNumber}`);
+            document.querySelectorAll('.wizard-step').forEach(el => el.classList.remove('is-active'));
+            document.getElementById(`step-${stepNumber}`).classList.add('is-active');
+        }
+
+        // --- CORE FUNCTIONS ---
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            console.log(`[File Upload] Received file: ${file.name} (${file.size} bytes)`);
+            
+            // Check file size (50MB limit)
+            if (file.size > 50 * 1024 * 1024) {
+                console.error('[File Upload] File exceeds 50MB limit.');
+                alert('File is too large. Please upload a file smaller than 50MB to prevent browser crash.');
+                return;
+            }
+
+            AppState.rawFileName = file.name;
+            fileNameDisplay.textContent = file.name;
+
+            const reader = new FileReader();
+
+            // PM Note: Here is where we handle the branching for different formats.
+            const extension = file.name.split('.').pop().toLowerCase();
+            
+            if (extension === 'txt' || file.name.includes('fnm')) {
+                console.warn('[Data Parsing] FNM 3.2 detected. Custom parser required, not supported in MVP.');
+                alert('FNM 3.2 format requires a custom fixed-width parser. Please use CSV or Excel for now.');
+                return;
+            }
+
+            if (extension === 'xml') {
+                console.warn('[Data Parsing] XML / MISMO 3.4 detected. Custom XML parsing required, not supported natively by SheetJS in a flat way.');
+                alert('MISMO XML parsing is complex and not fully supported in this MVP. Please upload CSV/Excel.');
+                return;
+            }
+
+            reader.onload = function(e) {
+                console.log('[File Upload] File read into memory successfully. Handing off to SheetJS.');
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    
+                    AppState.rawWorkbook = workbook;
+                    AppState.rawSheetName = workbook.SheetNames[0]; // Just taking the first sheet for MVP
+                    
+                    // Convert sheet to JSON array
+                    const jsonResult = XLSX.utils.sheet_to_json(workbook.Sheets[AppState.rawSheetName], { defval: "" });
+                    
+                    if (jsonResult.length === 0) {
+                        console.warn('[Data Parsing] File appears to be empty.');
+                        alert('No data found in the file.');
+                        return;
+                    }
+
+                    AppState.rawData = jsonResult;
+                    AppState.columnHeaders = Object.keys(jsonResult[0]);
+                    console.log(`[Data Parsing] Extracted ${jsonResult.length} rows and ${AppState.columnHeaders.length} columns.`);
+                    
+                    buildMappingTable();
+                    goToStep(2);
+                } catch (error) {
+                    console.error('[Data Parsing] Error parsing file:', error);
+                    alert('Error parsing the file. See console for details.');
+                }
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function buildMappingTable() {
+            console.log('[Mapping Step] Building mapping table UI...');
+            mappingTableBody.innerHTML = '';
+            
+            const firstRow = AppState.rawData[0] || {};
+
+            // Options for synthetic generation
+            const generatorOptions = `
+                <option value="">Keep Original (No Action)</option>
+                <option value="name.firstName">First Name</option>
+                <option value="name.lastName">Last Name</option>
+                <option value="name.fullName">Full Name</option>
+                <option value="location.streetAddress">Street Address</option>
+                <option value="location.city">City</option>
+                <option value="location.zipCode">Zip Code</option>
+                <option value="phone.number">Phone Number</option>
+                <option value="internet.email">Email</option>
+                <option value="finance.accountNumber">Account Number (Numeric)</option>
+                <option value="custom.id">Custom ID (Preserve Syntax)</option>
+            `;
+
+            AppState.columnHeaders.forEach(col => {
+                const tr = document.createElement('tr');
+                
+                // Try to guess the column type based on header name (Very basic heuristics)
+                let guessedType = "";
+                const lowerCol = col.toLowerCase();
+                if (lowerCol.includes('first') && lowerCol.includes('name')) guessedType = "name.firstName";
+                else if (lowerCol.includes('last') && lowerCol.includes('name')) guessedType = "name.lastName";
+                else if (lowerCol.includes('ssn') || lowerCol.includes('social')) guessedType = "custom.id";
+                else if (lowerCol.includes('email')) guessedType = "internet.email";
+
+                if(guessedType) {
+                    console.log(`[Mapping Step] Auto-guessed column "${col}" as "${guessedType}"`);
+                }
+
+                tr.innerHTML = `
+                    <td class="has-text-weight-bold">${col}</td>
+                    <td class="is-italic has-text-grey">${firstRow[col] ? String(firstRow[col]).substring(0, 30) : ''}</td>
+                    <td>
+                        <div class="select is-small">
+                            <select data-column="${col}" class="mapping-select">
+                                ${generatorOptions}
+                            </select>
+                        </div>
+                    </td>
+                `;
+                
+                mappingTableBody.appendChild(tr);
+
+                // Set the guessed value if we found one
+                if(guessedType) {
+                    tr.querySelector('select').value = guessedType;
+                }
+            });
+        }
+
+        function synthesizeData() {
+            if(!window.faker) {
+                console.error('[Synthesis] FakerJS not loaded yet!');
+                alert('FakerJS is still loading, please wait a second and try again.');
+                return;
+            }
+
+            console.log('[Synthesis] Starting synthesis process...');
+            
+            // Build the mapping dictionary from the UI
+            const selects = document.querySelectorAll('.mapping-select');
+            AppState.mapping = {};
+            let mappedCount = 0;
+            selects.forEach(select => {
+                if (select.value) {
+                    AppState.mapping[select.dataset.column] = select.value;
+                    mappedCount++;
+                }
+            });
+
+            console.log(`[Synthesis] User mapped ${mappedCount} columns.`, AppState.mapping);
+
+            // Referential Integrity Dictionary
+            // PM Note: This ensures if 'John Doe' appears twice, he gets the exact same fake name both times.
+            const dictionary = {}; 
+
+            AppState.syntheticData = AppState.rawData.map((row, index) => {
+                const newRow = { ...row }; // Clone row
+
+                for (const [col, generatorPath] of Object.entries(AppState.mapping)) {
+                    const originalValue = newRow[col];
+                    if (!originalValue) continue; // Skip empty cells
+
+                    // Create a unique cache key based on column type and original value
+                    const cacheKey = `${generatorPath}_${originalValue}`;
+
+                    if (dictionary[cacheKey]) {
+                        newRow[col] = dictionary[cacheKey]; // Use previously generated synthetic value
+                    } else {
+                        let syntheticValue = '';
+
+                        // Execute Faker generator or custom ID generator
+                        try {
+                            if (generatorPath === 'custom.id') {
+                                syntheticValue = generateSyntaxPreservedID(originalValue);
+                            } else {
+                                // Dynamically call faker functions (e.g., faker.name.firstName())
+                                const parts = generatorPath.split('.');
+                                syntheticValue = window.faker[parts[0]][parts[1]]();
+                            }
+                        } catch (err) {
+                            console.error(`[Synthesis] Error generating data for column ${col} with path ${generatorPath}`, err);
+                            syntheticValue = 'ERROR';
+                        }
+
+                        dictionary[cacheKey] = syntheticValue;
+                        newRow[col] = syntheticValue;
+                    }
+                }
+
+                if(index % 1000 === 0 && index !== 0) {
+                    console.log(`[Synthesis] Processed ${index} rows...`);
+                }
+
+                return newRow;
+            });
+
+            console.log('[Synthesis] Completed successfully.');
+            console.log('[Synthesis] Sample Output Row:', AppState.syntheticData[0]);
+            
+            goToStep(3);
+        }
+
+        // PM Note: This is a basic implementation of your "matching style and syntax" request.
+        // It replaces letters with letters, and numbers with numbers, keeping dashes/special chars intact.
+        function generateSyntaxPreservedID(originalValue) {
+            const strVal = String(originalValue);
+            let newId = '';
+            for (let i = 0; i < strVal.length; i++) {
+                const char = strVal[i];
+                if (/[a-zA-Z]/.test(char)) {
+                    // Replace with random letter, matching case
+                    const isUpper = char === char.toUpperCase();
+                    const randomLetter = window.faker.string.alpha(1);
+                    newId += isUpper ? randomLetter.toUpperCase() : randomLetter.toLowerCase();
+                } else if (/[0-9]/.test(char)) {
+                    // Replace with random number
+                    newId += window.faker.string.numeric(1);
+                } else {
+                    // Keep special characters (e.g., dashes, slashes, spaces)
+                    newId += char;
+                }
+            }
+            return newId;
+        }
+
+        function exportData() {
+            const format = document.getElementById('exportFormat').value;
+            console.log(`[Export] Generating export file in ${format} format...`);
+
+            if (format === 'json') {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(AppState.syntheticData, null, 2));
+                const downloadAnchorNode = document.createElement('a');
+                downloadAnchorNode.setAttribute("href", dataStr);
+                downloadAnchorNode.setAttribute("download", `synthetic_data.${format}`);
+                document.body.appendChild(downloadAnchorNode);
+                downloadAnchorNode.click();
+                downloadAnchorNode.remove();
+            } else {
+                // Use SheetJS to convert back to CSV/XLSX
+                const newWorksheet = XLSX.utils.json_to_sheet(AppState.syntheticData);
+                const newWorkbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(newWorkbook, newWorksheet, AppState.rawSheetName);
+                
+                XLSX.writeFile(newWorkbook, `synthetic_data.${format}`);
+            }
+            
+            console.log('[Export] File download triggered.');
+        }
+
+    </script>
+</body>
+</html>
