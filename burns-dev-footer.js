@@ -8,21 +8,60 @@ templateFooter.innerHTML = `
     :host {
       display: block;
       box-sizing: border-box;
+      background-color: #f8f9fa;
+      border-top: 1px solid #e9ecef;
+      color: #6c757d;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     .wrapper {
-      /* This wrapper provides the guaranteed spacing and centering */
-      display: grid;
-      place-content: center;
-      padding: 4rem 2rem; /* Generous vertical and horizontal padding */
-      max-width: 700px; /* Controls the max-width of the content inside */
-      margin: 0 auto;   /* Centers the wrapper horizontally on the page */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 3rem 1.5rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .verbiage {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+      max-width: 600px;
+    }
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .footer-links a {
+      color: #6c757d;
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover {
+      color: #000;
+    }
+    .copyright {
+      font-size: 0.8rem;
+      opacity: 0.8;
     }
   </style>
-  <div class="wrapper">
-    <!-- The <slot> is a placeholder. Any HTML you put inside -->
-    <!-- the <burns-dev-footer> tag on your page will appear here. -->
+  <footer class="wrapper">
+    <p class="verbiage">
+      I like to make modern work painless, and love to build tools that are open source, private, and on device &mdash; so we can focus on our impact, not the friction.
+    </p>
+    <div class="footer-links">
+      <slot name="links"></slot>
+      <a href="https://spuds0588.github.io/Burns-Development/">Tools</a>
+      <a href="https://www.linkedin.com/in/coreytburns/">LinkedIn</a>
+      <a href="https://youtube.com/@corey_burns">YouTube</a>
+    </div>
+    <div class="copyright">
+      &copy; ${new Date().getFullYear()} Corey Burns. Built for impact.
+    </div>
     <slot></slot>
-  </div>
+  </footer>
 `;
 class BurnsDevFooter extends HTMLElement { constructor() { super(); this.attachShadow({ mode: 'open' }); this.shadowRoot.appendChild(templateFooter.content.cloneNode(true)); } }
 customElements.define('burns-dev-footer', BurnsDevFooter);
