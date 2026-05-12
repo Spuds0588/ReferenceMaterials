@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Aid: Ordering Appraisals | Summit Mortgage Group</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e293b;
+            --secondary: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --border: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--primary);
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        .demo-ribbon {
+            background: var(--danger);
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header {
+            background: white;
+            padding: 40px 20px;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .logo-placeholder {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--secondary);
+            border-radius: 6px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        header p {
+            color: #64748b;
+            max-width: 600px;
+            margin: 10px auto 0;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .step-list {
+            list-style: none;
+        }
+
+        .step-item {
+            position: relative;
+            padding-left: 40px;
+            margin-bottom: 32px;
+        }
+
+        .step-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-item::before {
+            content: '';
+            position: absolute;
+            left: 14px;
+            top: 24px;
+            bottom: -20px;
+            width: 1px;
+            background: var(--border);
+        }
+
+        .step-item:last-child::before {
+            display: none;
+        }
+
+        .step-content h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .step-content p {
+            color: #475569;
+            font-size: 0.95rem;
+        }
+
+        .tip-box {
+            background: #eff6ff;
+            border-left: 4px solid var(--secondary);
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--bg-light);
+        }
+
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+
+        .check-icon {
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        .badge-success { background: #dcfce7; color: #166534; }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-ribbon">
+        EDUCATIONAL RESOURCE: This is a training job aid for Summit Mortgage Group (Demo)
+    </div>
+
+    <header>
+        <div class="logo-placeholder">
+            <div class="logo-icon"></div>
+            Summit Mortgage Group
+        </div>
+        <h1>Appraisal Ordering Guide</h1>
+        <p>Standard operating procedure for ordering residential appraisals via the Apex Appraisal Management portal.</p>
+    </header>
+
+    <main>
+        <div class="card">
+            <h2><span class="step-number">1</span> Pre-Order Checklist</h2>
+            <p style="margin-bottom: 16px;">Ensure you have the following ready before starting the order:</p>
+            <ul class="checklist">
+                <li><span class="check-icon">✓</span> Executed Sales Contract (for Purchases)</li>
+                <li><span class="check-icon">✓</span> Subject Property Address & Legal Description</li>
+                <li><span class="check-icon">✓</span> Borrower Contact Information (Phone & Email)</li>
+                <li><span class="check-icon">✓</span> Intent to Proceed (Signed by Borrower)</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2><span class="step-number">2</span> Order Process</h2>
+            <div class="step-list">
+                <div class="step-item">
+                    <div class="step-content">
+                        <h3>Log in to Apex AMC</h3>
+                        <p>Navigate to <code>portal.apexappraisal.demo</code> and enter your internal credentials.</p>
+                        <div class="tip-box">
+                            <strong>Note:</strong> If you've forgotten your password, use the "Forgot Password" link on the login page. Do not create a new account.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-content">
+                        <h3>New Order Entry</h3>
+                        <p>Select "New Order" from the dashboard. Choose the correct loan program (Conventional, FHA, or VA).</p>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-content">
+                        <h3>Property & Contact Details</h3>
+                        <p>Enter the property address. Ensure the contact for access (Owner, Tenant, or Agent) is clearly identified with a valid phone number.</p>
+                        <div class="tip-box">
+                            <strong>Pro Tip:</strong> Providing the Agent's cell phone number significantly speeds up inspection scheduling.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-content">
+                        <h3>Review & Payment</h3>
+                        <p>Confirm the fee disclosure matches the LE. Select "Bill to Lender" unless specific instructions specify "Pay at Door".</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Support & Escalations</h2>
+            <p>If you encounter issues with a specific order, follow these protocols:</p>
+            <div style="margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div style="padding: 16px; background: var(--bg-light); border-radius: 8px;">
+                    <span class="badge badge-info">Standard</span>
+                    <p style="margin-top: 8px; font-weight: 600;">Apex Help Desk</p>
+                    <p style="font-size: 0.85rem;">800-555-0199</p>
+                </div>
+                <div style="padding: 16px; background: var(--bg-light); border-radius: 8px;">
+                    <span class="badge badge-success">Internal</span>
+                    <p style="margin-top: 8px; font-weight: 600;">Summit Ops Support</p>
+                    <p style="font-size: 0.85rem;">Slack: #ops-appraisals</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 Summit Mortgage Group. Internal Training Use Only.</p>
+        <p style="margin-top: 8px;">This is a fake document created for teaching purposes.</p>
+    </footer>
+</body>
+</html>
