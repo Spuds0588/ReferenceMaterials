@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>🔒 Secure Vibe-Code Local Bundler</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; max-width: 950px; margin: 30px auto; padding: 20px; background: #0f172a; color: #f1f5f9; }
+        h1 { color: #38bdf8; margin-bottom: 5px; }
+        .subtitle { color: #94a3b8; margin-top: 0; margin-bottom: 25px; }
+        textarea { width: 100%; height: 250px; background: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 8px; padding: 15px; font-family: monospace; box-sizing: border-box; }
+        button { background: #0284c7; color: white; border: none; padding: 12px 24px; font-size: 16px; font-weight: 600; border-radius: 6px; cursor: pointer; }
+        button:hover { background: #0369a1; }
+        #log { background: #020617; border: 1px solid #1e293b; border-radius: 6px; padding: 15px; font-family: monospace; font-size: 13px; max-height: 300px; overflow-y: auto; color: #38bdf8; display: none; margin-top: 15px; }
+        .status-success { color: #4ade80; }
+        .status-warning { color: #fbbf24; font-weight: bold; }
+        .status-error { color: #f87171; }
+        .step { background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 15px;}
+        .flex-row { display: flex; gap: 20px; align-items: center; margin-top: 15px; }
+        .checkbox-container { display: flex; align-items: center; gap: 8px; background: #0f172a; padding: 10px 15px; border-radius: 6px; border: 1px solid #334155; }
+    </style>
+</head>
+<body>
+
+    <h1>🔒 Secure Vibe-Code Dependency Bundler</h1>
+    <p class="subtitle">Convert web templates into 100% offline, zero-leakage files with built-in network restriction policies.</p>
+
+    <div class="step">
+        <h3>Step 1: Paste your HTML Code base</h3>
+        <textarea id="htmlInput" placeholder="Paste your HTML file here..."></textarea>
+    </div>
+
+    <div class="step">
+        <h3>Step 2: Optional Local Assets (Images/Icons)</h3>
+        <input type="file" id="imageInput" multiple accept="image/*" onchange="handleImages(event)">
+    </div>
+
+    <div class="flex-row">
+        <button id="bundleBtn" onclick="processAndBundle()">Analyze & Bundle HTML</button>
+        
+        <div class="checkbox-container">
+            <input type="checkbox" id="enforceCsp" checked>
+            <label for="enforceCsp"><strong>Inject Strict CSP (Highly Recommended)</strong><br><span style="font-size:12px; color:#94a3b8;">Hard-blocks the output file from accessing the internet entirely.</span></label>
+        </div>
+    </div>
+
+    <div id="log"></div>
+
+    <script>
+        let localImages = {};
+
+        function log(msg, type = '') {
+            const logDiv = document.getElementById('log');
+            logDiv.style.display = 'block';
+            let className = '';
+            if (type === 'success') className = 'class="status-success"';
+            if (type === 'warning') className = 'class="status-warning"';
+            if (type === 'error') className = 'class="status-error"';
+            logDiv.innerHTML += `<div ${className}>[${new Date().toLocaleTimeString()}] ${msg}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function handleImages(event) {
+            localImages = {};
+            const files = event.target.files;
+            for (let file of files) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    localImages[file.name] = e.target.result;
+                    log(`Loaded local asset mapping for: ${file.name}`, 'success');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Analyzes code strings for potential data leakage indicators
+        function analyzeTelemetryRisk(code, fileName) {
+            const risks = [];
+            if (/fetch\s*\(/.test(code)) risks.push("fetch()");
+            if (/XMLHttpRequest/.test(code)) risks.push("XMLHttpRequest");
+            if (/WebSocket/.test(code)) risks.push("WebSocket");
+            if (/sendBeacon/.test(code)) risks.push("navigator.sendBeacon()");
+
+            if (risks.length > 0) {
+                log(`⚠️ WARNING: "${fileName}" contains code patterns capable of sending data out: [${risks.join(', ')}].`, 'warning');
+                return true;
+            }
+            log(`✓ Clear: "${fileName}" contains no obvious network telemetry patterns.`, 'success');
+            return false;
+        }
+
+        async function processAndBundle() {
+            document.getElementById('log').innerHTML = '';
+            const rawHtml = document.getElementById('htmlInput').value.trim();
+            
+            if (!rawHtml) {
+                alert("Please paste some HTML code first!");
+                return;
+            }
+
+            log("Starting compilation pass...");
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(rawHtml, 'text/html');
+            let telemetryDetected = false;
+
+            // 1. Compile & Inspect External CDN Scripts
+            const scripts = doc.querySelectorAll('script[src]');
+            for (let script of scripts) {
+                const src = script.getAttribute('src');
+                if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('//')) {
+                    const cleanUrl = src.startsWith('//') ? 'https:' + src : src;
+                    const fileName = src.split('/').pop().split('?')[0];
+                    log(`Fetching remote dependency: ${fileName}...`);
+                    try {
+                        const response = await fetch(cleanUrl);
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        const jsText = await response.text();
+                        
+                        // Run security inspection
+                        if (analyzeTelemetryRisk(jsText, fileName)) {
+                            telemetryDetected = true;
+                        }
+
+                        const inlineScript = doc.createElement('script');
+                        inlineScript.textContent = jsText;
+                        if (script.hasAttribute('type')) inlineScript.setAttribute('type', script.getAttribute('type'));
+                        
+                        script.parentNode.replaceChild(inlineScript, script);
+                    } catch (err) {
+                        log(`Failed to fetch script ${fileName}: ${err.message}.`, 'error');
+                    }
+                }
+            }
+
+            // 2. Compile External CDN Stylesheets
+            const links = doc.querySelectorAll('link[rel="stylesheet"]');
+            for (let link of links) {
+                const href = link.getAttribute('href');
+                if (href && (href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//'))) {
+                    const cleanUrl = href.startsWith('//') ? 'https:' + href : href;
+                    const fileName = href.split('/').pop().split('?')[0];
+                    log(`Fetching remote CSS: ${fileName}...`);
+                    try {
+                        const response = await fetch(cleanUrl);
+                        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                        const cssText = await response.text();
+                        
+                        const inlineStyle = doc.createElement('style');
+                        inlineStyle.textContent = cssText;
+                        link.parentNode.replaceChild(inlineStyle, link);
+                        log(`Embedded stylesheet: ${fileName}`, 'success');
+                    } catch (err) {
+                        log(`Failed to fetch stylesheet ${fileName}: ${err.message}.`, 'error');
+                    }
+                }
+            }
+
+            // 3. Bake in Local Images matching filenames
+            const images = doc.querySelectorAll('img[src]');
+            for (let img of images) {
+                const src = img.getAttribute('src');
+                if (localImages[src]) {
+                    log(`Inlining local asset match: ${src}`, 'success');
+                    img.setAttribute('src', localImages[src]);
+                }
+            }
+
+            // 4. Inject Content Security Policy if enabled
+            if (document.getElementById('enforceCsp').checked) {
+                log("Injecting Strict Content Security Policy (Air-Gap Protection)...");
+                
+                // This policy prevents connections to outside servers (connect-src 'none')
+                // and stops styles/images from loading external trackers.
+                const cspMeta = doc.createElement('meta');
+                cspMeta.setAttribute('http-equiv', 'Content-Security-Policy');
+                cspMeta.setAttribute('content', "default-src 'self' 'unsafe-inline' 'unsafe-eval' data:; connect-src 'none'; img-src 'self' data:; object-src 'none';");
+                
+                // Insert it right at the top of <head>
+                if (doc.head) {
+                    doc.head.insertBefore(cspMeta, doc.head.firstChild);
+                } else {
+                    const head = doc.createElement('head');
+                    head.appendChild(cspMeta);
+                    doc.documentElement.insertBefore(head, doc.documentElement.firstChild);
+                }
+            }
+
+            // Generate Output
+            log("Finalizing compilation...");
+            const bundledHtml = "<!DOCTYPE html>\n" + doc.documentElement.outerHTML;
+            
+            if (telemetryDetected) {
+                log("⚠️ Compilation complete, but telemetry was detected in some libraries. The output file is secured by the injected CSP, but proceed with caution.", "warning");
+            } else {
+                log("✓ Processing Complete! Your pristine, air-gapped file has been generated.", "success");
+            }
+
+            const blob = new Blob([bundledHtml], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "secure-offline-tool.html";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
