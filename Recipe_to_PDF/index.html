@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe PDF Share Loop</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-color: #1f2937;
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --border-color: #e5e7eb;
+            --accent-color: #10b981;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #111827;
+                --card-bg: #1f2937;
+                --text-color: #f9fafb;
+                --primary-color: #3b82f6;
+                --primary-hover: #2563eb;
+                --border-color: #374151;
+            }
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .hidden { display: none !important; }
+        .form-group { margin-bottom: 20px; }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: transparent;
+            color: inherit;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover { background-color: var(--primary-hover); }
+        .status-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .status-loading { background-color: rgba(37, 99, 235, 0.15); color: var(--primary-color); }
+        .status-error { background-color: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .status-success { background-color: rgba(16, 185, 129, 0.15); color: var(--accent-color); }
+        .preview-box {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        .footer-link { text-align: center; margin-top: 15px; font-size: 13px; }
+        .footer-link a { color: var(--primary-color); text-decoration: none; }
+        .spinner {
+            border: 3px solid rgba(0,0,0,0.1);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border-left-color: var(--primary-color);
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="setup-view" class="hidden">
+        <h1>Configure Gemini API</h1>
+        <p style="font-size: 14px; opacity: 0.8; margin-bottom: 20px; text-align: center;">To keep this tool entirely free and private, your API key is saved directly to your device's local storage.</p>
+        <div class="form-group">
+            <label for="api-key-input">Gemini API Key</label>
+            <input type="password" id="api-key-input" placeholder="AIzaSy...">
+        </div>
+        <button id="save-key-btn">Save Key & Continue</button>
+        <div class="footer-link">
+            <a href="https://aistudio.google.com/" target="_blank" rel="noopener">Get a free API key from Google AI Studio</a>
+        </div>
+    </div>
+
+    <div id="main-view" class="hidden">
+        <h1>Recipe PDF Loop</h1>
+        
+        <div id="status-container" class="status-box hidden">
+            <div id="status-text">Processing request...</div>
+            <div id="status-spinner" class="spinner hidden"></div>
+        </div>
+
+        <div id="manual-input-flow">
+            <div class="form-group">
+                <label for="recipe-url-input">Recipe Website or Video URL</label>
+                <input type="text" id="recipe-url-input" placeholder="https://example.com/recipe">
+            </div>
+            <button id="extract-btn">Extract & Create PDF</button>
+            <div class="footer-link">
+                <a href="#" id="reset-key-link">Reset Saved API Key</a>
+            </div>
+        </div>
+
+        <div id="output-flow" class="hidden">
+            <label>Extracted Structured JSON Preview</label>
+            <div id="recipe-preview" class="preview-box"></div>
+            <button id="share-pdf-btn" style="background-color: var(--accent-color);">Share PDF to Drive</button>
+            <button id="cancel-btn" style="background-color: transparent; color: var(--text-color); margin-top: 10px; border: 1px solid var(--border-color);">Convert Another</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const $ = id => document.getElementById(id);
+    const setupView = $('setup-view'), mainView = $('main-view'), apiKeyInput = $('api-key-input'), 
+          saveKeyBtn = $('save-key-btn'), statusContainer = $('status-container'), statusText = $('status-text'), 
+          statusSpinner = $('status-spinner'), recipeUrlInput = $('recipe-url-input'), extractBtn = $('extract-btn'), 
+          resetKeyLink = $('reset-key-link'), outputFlow = $('output-flow'), manualInputFlow = $('manual-input-flow'), 
+          recipePreview = $('recipe-preview'), sharePdfBtn = $('share-pdf-btn'), cancelBtn = $('cancel-btn');
+
+    let currentPdfBlob = null, currentRecipeTitle = "Recipe";
+
+    window.addEventListener('DOMContentLoaded', () => {
+        console.log('[App] Initializing Recipe Share Loop...');
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('[Service Worker] Registered Successfully'))
+                .catch(err => console.warn('[Service Worker] Registration Failed (Expected if missing sw.js file)', err));
+        }
+        initApp();
+    });
+
+    function initApp() {
+        const key = localStorage.getItem('USER_GEMINI_KEY');
+        console.log(`[App] API Key present in LocalStorage: ${!!key}`);
+        setupView.classList.toggle('hidden', !!key);
+        mainView.classList.toggle('hidden', !key);
+        if (key) checkSharedIntent();
+    }
+
+    saveKeyBtn.addEventListener('click', () => {
+        const val = apiKeyInput.value.trim();
+        if(!val) return console.warn('[App] Empty API Key submitted');
+        localStorage.setItem('USER_GEMINI_KEY', val);
+        console.log('[App] API Key saved to LocalStorage');
+        initApp();
+    });
+
+    apiKeyInput.addEventListener('keydown', e => e.key === 'Enter' && saveKeyBtn.click());
+
+    resetKeyLink.addEventListener('click', e => {
+        e.preventDefault();
+        localStorage.removeItem('USER_GEMINI_KEY');
+        console.log('[App] API Key cleared from LocalStorage');
+        initApp();
+    });
+
+    function checkSharedIntent() {
+        const sharedUrl = new URL(window.location.href).searchParams.get('shared_url');
+        if (sharedUrl) {
+            console.log(`[App] Shared Intent Detected. URL: ${sharedUrl}`);
+            recipeUrlInput.value = sharedUrl;
+            handleExtraction(sharedUrl);
+        }
+    }
+
+    extractBtn.addEventListener('click', () => {
+        const url = recipeUrlInput.value.trim();
+        if(url) handleExtraction(url);
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        outputFlow.className = 'hidden';
+        manualInputFlow.classList.remove('hidden');
+        statusContainer.className = 'status-box hidden';
+        recipeUrlInput.value = '';
+        currentPdfBlob = null;
+        console.log('[App] Reset UI for next extraction');
+    });
+
+    async function handleExtraction(url) {
+        console.log(`[Extraction] Initiating extraction for: ${url}`);
+        showStatus('Gemini is crawling the target page...', 'loading');
+        manualInputFlow.className = 'hidden';
+        outputFlow.className = 'hidden';
+        
+        try {
+            const recipeData = await fetchRecipeFromGemini(url);
+            currentRecipeTitle = recipeData.title || "Recipe";
+            console.log(`[Extraction] Parsed Recipe Title: ${currentRecipeTitle}`);
+            
+            showStatus('Compiling clean layout into PDF...', 'loading');
+            currentPdfBlob = generatePdfBlob(recipeData);
+            console.log('[Extraction] PDF Blob successfully generated');
+            
+            recipePreview.textContent = JSON.stringify(recipeData, null, 2);
+            showStatus('Recipe successfully converted!', 'success');
+            outputFlow.classList.remove('hidden');
+
+            if (new URL(window.location.href).searchParams.get('shared_url')) {
+                console.log('[App] Auto-triggering share sheet from intent...');
+                await triggerSystemShare();
+            }
+        } catch (error) {
+            console.error('[Extraction] Failure during pipeline:', error);
+            showStatus('Extraction failed: ' + error.message, 'error');
+            manualInputFlow.classList.remove('hidden');
+        }
+    }
+
+    async function fetchRecipeFromGemini(recipeUrl) {
+        const apiKey = localStorage.getItem('USER_GEMINI_KEY');
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`;
+
+        const payload = {
+            contents: [{
+                parts: [{
+                    text: `Perform a Google Search to access the full content at this exact URL: ${recipeUrl}. Read the entire page, bypass all life stories, advertisements, and tracking clutter, and extract the clear recipe instructions. Return your response EXCLUSIVELY as a raw, standardized JSON object matching this exact structure layout. Do not wrap it in markdown formatting strings:\n{"title": "string","prepTime": "string","cookTime": "string","ingredients": ["string"],"instructions": ["string"]}`
+                }]
+            }],
+            tools: [{ googleSearch: {} }] 
+        };
+
+        console.log('[API] Sending Request to Gemini API:', payload);
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            console.error('[API] HTTP Error Response:', data);
+            throw new Error(data.error?.message || 'HTTP Engine Interface Failure');
+        }
+
+        console.log('[API] Successful Response:', data);
+        const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!rawText) throw new Error("Unexpected API Response Structure");
+        
+        return cleanAndParseJson(rawText);
+    }
+
+    function cleanAndParseJson(text) {
+        console.log('[Parser] Attempting to parse raw text response...');
+        try {
+            return JSON.parse(text.trim());
+        } catch (e) {
+            console.warn('[Parser] Standard parse failed, attempting markdown extraction block...');
+            const cleanText = text.replace(/```json|```/gi, '').trim();
+            const start = cleanText.indexOf('{'), end = cleanText.lastIndexOf('}');
+            if (start !== -1 && end !== -1) {
+                return JSON.parse(cleanText.substring(start, end + 1));
+            }
+            console.error('[Parser] Completely failed to isolate valid JSON block from text:', text);
+            throw new Error("Unable to locate operational layout array blocks inside API response text.");
+        }
+    }
+
+    function generatePdfBlob(recipe) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(22);
+        doc.text(String(recipe.title || "Recipe Extract"), 20, 20);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
+        let y = 32;
+
+        if (recipe.prepTime || recipe.cookTime) {
+            doc.text(`Prep Time: ${recipe.prepTime || 'N/A'}  |  Cook Time: ${recipe.cookTime || 'N/A'}`, 20, y);
+            y += 12;
+        }
+
+        doc.setDrawColor(200, 200, 200);
+        doc.line(20, y, 190, y);
+        y += 10;
+
+        const safeAddPage = () => { if (y > 275) { doc.addPage(); y = 20; } };
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.text("Ingredients", 20, y);
+        y += 8;
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
+        (recipe.ingredients || []).forEach(ing => {
+            safeAddPage();
+            doc.text(`[ ]  ${String(ing)}`, 22, y);
+            y += 7;
+        });
+
+        y += 5;
+        safeAddPage();
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.text("Instructions", 20, y);
+        y += 8;
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
+        (recipe.instructions || []).forEach((inst, idx) => {
+            const lines = doc.splitTextToSize(`${idx + 1}. ${String(inst)}`, 165);
+            lines.forEach(line => {
+                safeAddPage();
+                doc.text(line, 22, y);
+                y += 6;
+            });
+            y += 3;
+        });
+
+        return doc.output('blob');
+    }
+
+    sharePdfBtn.addEventListener('click', triggerSystemShare);
+
+    async function triggerSystemShare() {
+        if (!currentPdfBlob) return console.warn('[Share] No PDF Blob available to share');
+        
+        const fileName = currentRecipeTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.pdf';
+        const file = new File([currentPdfBlob], fileName, { type: 'application/pdf' });
+
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            console.log('[Share] System share API supported. Launching OS Share Sheet...');
+            try {
+                await navigator.share({ files: [file], title: currentRecipeTitle, text: 'Cleaned recipe Document.' });
+                console.log('[Share] Document shared successfully');
+            } catch (err) {
+                console.log('[Share] System share closed or failed:', err);
+            }
+        } else {
+            console.log('[Share] System Share API unavailable. Falling back to local download...');
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(currentPdfBlob);
+            link.download = fileName;
+            link.click();
+        }
+    }
+
+    function showStatus(msg, type) {
+        statusContainer.className = `status-box status-${type}`;
+        statusSpinner.classList.toggle('hidden', type !== 'loading');
+        statusText.textContent = msg;
+        console.log(`[UI Status] ${msg} (${type})`);
+    }
+</script>
+</body>
+</html>
