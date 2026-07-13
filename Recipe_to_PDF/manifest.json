@@ -1,0 +1,22 @@
+{
+  "name": "Recipe PDF Share Loop",
+  "short_name": "RecipeLoop",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1083/1083546.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "url": "shared_url"
+    }
+  }
+}
